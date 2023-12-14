@@ -1,0 +1,11 @@
+# python
+__pycache__
+
+# antlr
+.antlr
+*.interp
+*.tokens
+Cgrammer.py
+
+# IDE
+.idea
