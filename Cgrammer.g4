@@ -11,16 +11,48 @@ PTR: ANNOUNCER'*';
 ARRAY: ANNOUNCER'[]';
 
 // 关键字规则
+CONST: 'const';
 IF: 'if';
 ELSE: 'else';
+ELIF: 'else if';
+SWITCH: 'switch';
+CASE: 'case';
+DEFAULT: 'default';
 FOR: 'for';
-// ...
+DO: 'do';
+WHILE: 'while';
+BREAK: 'break';
+CONTINUE: 'continue';
+RETURN: 'return';
+VOID: 'void';
 
 // 运算符规则
+EQUAL: '==';
+NOTEQUAL: '!=';
 ASSIGN: '=';
+PLUSASSIGN: '+=';
+MINUSASSIGN: '-=';
+MULTIPLYASSIGN: '*=';
+DIVIDEASSIGN: '/=';
+MODULOASSIGN: '%=';
 PLUS: '+';
 MINUS: '-';
-// ...
+MULTIPLY: '*';
+DIVIDE: '/';
+MODULO: '%';
+GEQUAL: '>=';
+GREATER: '>';
+LEQUAL: '<=';
+LESS: '<';
+AND: '&&';
+OR: '||';
+NOT: '!';
+BITAND: '&';
+BITOR: '|';
+BITNOT: '~';
+BITXOR: '^';
+LSHIFT: '<<';
+RSHIFT: '>>';
 
 // 分隔符规则
 SEMICOLON: ';';
