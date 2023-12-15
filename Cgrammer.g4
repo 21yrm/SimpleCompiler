@@ -35,9 +35,11 @@ MINUSASSIGN: '-=';
 MULTIPLYASSIGN: '*=';
 DIVIDEASSIGN: '/=';
 MODULOASSIGN: '%=';
+SELFPLUS: '++';
+SELFMINUS: '--';
 PLUS: '+';
 MINUS: '-';
-MULTIPLY: '*';
+MULTIPLYorREFERENCE: '*';
 DIVIDE: '/';
 MODULO: '%';
 GEQUAL: '>=';
@@ -47,7 +49,7 @@ LESS: '<';
 AND: '&&';
 OR: '||';
 NOT: '!';
-BITAND: '&';
+BITANDorADDRESS: '&';
 BITOR: '|';
 BITNOT: '~';
 BITXOR: '^';
@@ -57,8 +59,13 @@ RSHIFT: '>>';
 // 分隔符规则
 SEMICOLON: ';';
 COMMA: ',';
-// ...
+LROUND: '(';
+RROUND: ')';
+LSQUARE: '[';
+RSQUARE: ']';
+LCURLY: '{';
+RCURLY: '}';
 
 // 忽略空白字符和注释
 WS: [ \t\r\n]+ -> skip;
-COMMENT: '//' ~[\r\n]*;
+COMMENT: '//' ~[\r\n]* '\r'? '\n' -> skip ;
