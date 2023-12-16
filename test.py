@@ -17,5 +17,6 @@ def main():
     for token in stream.tokens:
         print(token.text)
 
+
 if __name__ == '__main__':
     main()
