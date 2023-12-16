@@ -20,6 +20,9 @@ FOR: 'for';
 ASSIGN: '=';
 PLUS: '+';
 MINUS: '-';
+MULTIPLE: '*';
+DIVIDE: '/';
+LOAD: '&';
 // ...
 
 // 分隔符规则
