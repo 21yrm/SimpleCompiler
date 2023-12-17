@@ -1,3 +1,6 @@
+// #include <stdio.h>
+// #include <stdbool.h> 
+// include .h for running
 size_t strlen(const char *_Str);
 int printf( const char *restrict format, ... );
 int scanf(const char *__format, ...);

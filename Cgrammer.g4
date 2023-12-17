@@ -1,15 +1,23 @@
 lexer grammar Cgrammer;
 
+// 库函数
+MEMSET: 'void *memset(void *s, int ch, size_t n)';
+STRLEN: 'size_t strlen(const char *_Str)';
+PRINTF: 'int printf( const char *restrict format, ... )';
+SCANF: 'int scanf(const char *__format, ...)';
+
 // 变量规则
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
+FLOAT: [0-9]+'.'[0-9]+;
 INT: [-+]?([1-9][0-9]* | '0');
-FLOAT: [0-9]+.[0-9]+;
-CHAR: '\''[a-zA-Z_]'\'';
-
-ANNOUNCER: 'int' | 'float' | 'char';
-ARRAY: ANNOUNCER'[]';
+fragment CHARCONTENT: '\''[0rntvbfa?'"\\] | .;
+CHAR: '\'' CHARCONTENT '\'';
+STRING: '"' CHARCONTENT*? '"';
+BOOL: 'true' | 'false';
 
 // 关键字规则
+ANNOUNCER: 'int' | 'float' | 'char' | 'bool';
+ARRAY: ANNOUNCER'[]';
 CONST: 'const';
 IF: 'if';
 ELSE: 'else';
@@ -38,7 +46,7 @@ SELFPLUS: '++';
 SELFMINUS: '--';
 PLUS: '+';
 MINUS: '-';
-MULTIPLYorREFERENCE: '*';
+MULTIPLYorREFERENCEorPTR: '*';
 DIVIDE: '/';
 MODULO: '%';
 GEQUAL: '>=';
@@ -54,6 +62,7 @@ BITNOT: '~';
 BITXOR: '^';
 LSHIFT: '<<';
 RSHIFT: '>>';
+ELLIPSIS: '...';
 
 // 分隔符规则
 SEMICOLON: ';';

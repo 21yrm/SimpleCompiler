@@ -1,3 +1,9 @@
+// #include <stdio.h>
+// #include <stdbool.h>
+// #include <stdlib.h>
+// #include <string.h>
+// include .h for running
+
 void *memset(void *s, int ch, size_t n);
 size_t strlen(const char *_Str);
 int printf( const char *restrict format, ... );
