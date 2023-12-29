@@ -1,4 +1,12 @@
-lexer grammar Cgrammer;
+grammar Cgrammer;
+
+variant: IDENTIFIER | FLOAT | INT;
+expr: (expr) | expr *;
+while: WHILE LROUND expr RROUND;
+code_block: expression+;
+
+
+
 
 // 库函数
 MEMSET: 'void *memset(void *s, int ch, size_t n)';
