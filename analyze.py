@@ -42,7 +42,10 @@ class Visitor(CgrammerVisitor):
                         current_node[CgrammerParser.ruleNames[child.getRuleIndex()]] = []
                     current_node[CgrammerParser.ruleNames[child.getRuleIndex()]].append(self.visit(child))
                 else:
-                    current_node[CgrammerLexer.symbolicNames[child.getPayload().type]] = child.getText()
+                    if hasattr(child.getPayload(), 'type'):
+                        current_node[CgrammerLexer.symbolicNames[child.getPayload().type]] = child.getText()
+                    else:
+                        current_node[CgrammerParser.ruleNames[child.getRuleIndex()]] = []
         else:
             current_node = node.getText()
 
