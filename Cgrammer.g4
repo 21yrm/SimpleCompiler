@@ -226,8 +226,8 @@ lib_announce: MEMSET # memest_announce
 function_definition: type IDENTIFIER LROUND params? RROUND LCURLY code ( RETURN value? SEMICOLON)? RCURLY;
 
 if_block: IF LROUND expression RROUND expression LCURLY code RCURLY
-          (ELIF LROUND expression RROUND LCURLY code RCURLY)*
-          ELSE LCURLY code RCURLY;
+          ( ELIF LROUND expression RROUND LCURLY code RCURLY )*
+          ( ELSE LCURLY code RCURLY )?;
 while_block: WHILE LROUND expression RROUND LCURLY code RCURLY;
 for_block: FOR LROUND (variable_declaration | assignment | expression )? SEMICOLON expression SEMICOLON assignment? RROUND LCURLY code RCURLY;
 switch_block: SWITCH LROUND expression RROUND LCURLY (CASE value COLON code)+ RCURLY;
