@@ -106,7 +106,6 @@ value: IDENTIFIER # id
         | STRINGVALUE # string_value
         | BOOLVALUE # bool_value
         | function_call # function_call_;
-// 生成运算表达�?
 
 // 最高优先级：括�? �?
 expr_l0: LROUND expression RROUND # round
@@ -115,12 +114,11 @@ expr_l0: LROUND expression RROUND # round
 // 优先�?1: 取内�? 取址 数组
 expr_l1_s1: MULTIPLYorREFERENCEorPTR expr_l0 # content_of_
             | BITANDorADDRESS expr_l0 # address_of_
-            | expr_l0 LSQUARE expression RSQUARE # array_
-            | expr_l0 # next_11;
+            | expr_l0 (LSQUARE expression RSQUARE)? # array_;
+            // | expr_l0 # next_11;
 expr_l1: MULTIPLYorREFERENCEorPTR expr_l1_s1 # content_of
          | BITANDorADDRESS expr_l1_s1 # address_of
-         | expr_l1_s1 LSQUARE expression RSQUARE # array
-         | expr_l1_s1 # next_1;
+         | expr_l1_s1 (LSQUARE expression RSQUARE)? # array;
 
 // 优先�?2: �?�? �?�? 取非 正号 负号
 expr_l2_s1: SELFPLUS expr_l2_s1 # liecrese
@@ -134,78 +132,92 @@ rop_l2: SELFPLUS # rincrease | SELFMINUS # dincrease;
 expr_l2: expr_l2_s1 rop_l2*;
 
 // 优先�?3：乘 �? �?
-expr_l3_s1: expr_l2 MULTIPLYorREFERENCEorPTR expr_l2 # multiply_
-            | expr_l2 DIVIDE expr_l2 # divide_
-            | expr_l2 MODULO expr_l2 # modulo_
-            | expr_l2 # next_31;
+expr_l3_s1_r: MULTIPLYorREFERENCEorPTR expr_l2 # multiply_
+              | DIVIDE expr_l2 # divide_
+              | MODULO expr_l2 # modulo_;
 
-expr_l3: expr_l3_s1 MULTIPLYorREFERENCEorPTR expr_l3 # multiply
-         | expr_l3_s1 DIVIDE expr_l3 # divide
-         | expr_l3_s1 MODULO expr_l3 # modulo
-         | expr_l3_s1 # next_3;
+expr_l3_s1: expr_l2 expr_l3_s1_r?;
+
+expr_l3_r: MULTIPLYorREFERENCEorPTR expr_l3 # multiply
+           | DIVIDE expr_l3 # divide
+           | MODULO expr_l3 # modulo;
+
+expr_l3: expr_l3_s1 expr_l3_r?;
 
 // 优先�?4: �? �?
-expr_l4_s1: expr_l3 PLUS expr_l3 # add_
-            | expr_l3 MINUS expr_l3 # subtract_
-            | expr_l3 # next_41;
+expr_l4_s1_r: PLUS expr_l3 # add_
+              | MINUS expr_l3 # subtract_;
 
-expr_l4: expr_l4_s1 PLUS expr_l4 # add
-         | expr_l4_s1 MINUS expr_l4 # subtract
-         | expr_l4_s1 # next_4;
+expr_l4_s1: expr_l3 expr_l4_s1_r?;
+
+expr_14_r: PLUS expr_l4 # add
+           | MINUS expr_l4 # subtract;
+
+expr_l4: expr_l4_s1 expr_14_r?;
 
 // 优先�?5: 左移 右移
-expr_l5_s1: expr_l4 LSHIFT expr_l4 # lshift_
-            | expr_l4 RSHIFT expr_l4 # rshift_
-            | expr_l4 # next_51;
+expr_l5_s1_r: LSHIFT expr_l4 # lshift_
+              | RSHIFT expr_l4 # rshift_;
 
-expr_l5: expr_l5_s1 LSHIFT expr_l5 # lshift
-         | expr_l5_s1 RSHIFT expr_l5 # rshift
-         | expr_l5_s1 # next_5;
+expr_l5_s1: expr_l4 expr_l5_s1_r?;
+
+expr_l5_r: LSHIFT expr_l5 # lshift
+           | RSHIFT expr_l5 # rshift;
+
+expr_l5: expr_l5_s1 expr_l5_r?;
 
 // 优先�?6: 等于 不等�?
-expr_l6_s1: expr_l5 EQUAL expr_l5 # equal_
-            | expr_l5 NOTEQUAL expr_l5 # nequal_
-            | expr_l5 # next_61;
+expr_16_s1_r: EQUAL expr_l5 # equal_
+            | NOTEQUAL expr_l5 # nequal_;
 
-expr_l6: expr_l6_s1 EQUAL expr_l6 # equal
-         | expr_l6_s1 EQUAL expr_l6 # nequal
-         | expr_l6_s1 # next_6;
+expr_l6_s1: expr_l5 expr_16_s1_r?;
+
+expr_l6_r: EQUAL expr_l6 # equal
+           | expr_l6_s1 EQUAL expr_l6 # nequal;
+
+expr_l6: expr_l6_s1 expr_l6_r?;
 
 // 优先�?7: 大于(等于) 小于(等于)
-expr_l7_s1: expr_l6 GREATER expr_l6 # greater_
-            | expr_l6 GEQUAL expr_l6 # gequal_
-            | expr_l6 LESS expr_l6 # less_
-            | expr_l6 LEQUAL expr_l6 # leuqal_
-            | expr_l6 # next_71;
+expr_l7_s1_r: GREATER expr_l6 # greater_
+              | GEQUAL expr_l6 # gequal_
+              | LESS expr_l6 # less_
+              | LEQUAL expr_l6 # leuqal_;
 
-expr_l7: expr_l7_s1 GREATER expr_l7 # greater
-         | expr_l7_s1 GEQUAL expr_l7 # gequal
-         | expr_l7_s1 LESS expr_l7 # less
-         | expr_l7_s1 LEQUAL expr_l7 # leuqal
-         | expr_l6_s1 # next_7;
+expr_l7_s1: expr_l6 expr_l7_s1_r?;
+
+expr_l7_r: GREATER expr_l7 # greater
+           | GEQUAL expr_l7 # gequal
+           | LESS expr_l7 # less
+           | LEQUAL expr_l7 # leuqal;
+
+expr_l7: expr_l7_s1 expr_l7_r?;
 
 // 优先�?8: 位运�?
 expr_l8_s1: BITNOT expr_l8_s1 # bitnot__
             | expr_l7 # next_81;
 
-expr_l8_s2: expr_l8_s1 BITANDorADDRESS expr_l8_s1 # bitandd_
-            | expr_l8_s1 BITOR expr_l8_s1 # bitor_
-            | expr_l8_s1 BITXOR expr_l8_s1 # bitnot_
-            | expr_l8_s1 # next_82;
+expr_l8_s2_r: BITANDorADDRESS expr_l8_s1 # bitandd_
+              | BITOR expr_l8_s1 # bitor_
+              | BITXOR expr_l8_s1 # bitnot_;
 
-expr_l8: expr_l8_s2 BITANDorADDRESS expr_l8 # bitandd
-         | expr_l8_s2 BITOR expr_l8 # bitor
-         | expr_l8_s2 BITXOR expr_l8 # bitnot
-         | expr_l8_s2 # next_8;
+expr_l8_s2: expr_l8_s1 expr_l8_s2_r?;
+
+expr_l8_r: BITANDorADDRESS expr_l8 # bitandd
+           | BITOR expr_l8 # bitor
+           | BITXOR expr_l8 # bitnot;
+
+expr_l8: expr_l8_s2 expr_l8_r?;
 
 // 优先�?9：逻辑�? 逻辑�?
-expr_l9_s1: expr_l8 AND expr_l8 # and_
-            | expr_l8 OR expr_l8 # or_
-            | expr_l8 # next_91;
+expr_l9_s1_r: AND expr_l8 # and_
+              | OR expr_l8 # or_;
 
-expr_l9: expr_l9_s1 AND expr_l9 # and
-         | expr_l9_s1 OR expr_l9 # or
-         | expr_l8_s1 # next_9;
+expr_l9_s1: expr_l8 expr_l9_s1_r?;
+
+expr_l9_r: AND expr_l9 # and
+          | OR expr_l9 # or;
+          
+expr_l9: expr_l9_s1 expr_l9_r?;
 
 expression: expr_l9;
 
@@ -218,6 +230,7 @@ assignment_operator: ASSIGN # assign
 assignment: IDENTIFIER(index)* assignment_operator expression;
 
 variable_definition: type assignment;
+
 // 生成代码�?
 lib_announce: MEMSET # memest_announce
             | STRLEN # strlen_announce
