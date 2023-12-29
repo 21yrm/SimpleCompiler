@@ -4,7 +4,8 @@ import os
 from antlr4 import *
 from Cgrammer import Cgrammer
 
-def generateTokens(c_file_path):        
+
+def generateTokens(c_file_path):
     # 读取 C 文件
     input = FileStream(c_file_path)
 
@@ -27,6 +28,7 @@ def generateTokens(c_file_path):
 
     return token_list
 
+
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
 
@@ -34,7 +36,7 @@ if __name__ == '__main__':
     args = arg_parser.parse_args()
 
     c_file_path = args.path
-    c_file_path : str
+    c_file_path: str
     if not c_file_path.endswith(".c") or not os.path.exists(c_file_path):
         raise Exception("Given path is invalid")
     tokens = generateTokens(c_file_path)
