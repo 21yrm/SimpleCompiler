@@ -20,12 +20,19 @@ char orderBetween(char a, char b){
     switch (a)
     {
         case '*':
+            if(b == '*' || b == '/')
+                return '<';
+            else
+                return '>';
         case '/':
             if(b == '*' || b == '/')
                 return '<';
             else
                 return '>';
         case '+':
+            if(b == '(')
+                return '>';
+            return '<';
         case '-':
             if(b == '(')
                 return '>';

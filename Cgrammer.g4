@@ -97,7 +97,7 @@ index: LSQUARE ( value | expression | function_call ) RSQUARE;
 lib_function: MEMSETFUNC # memset| STRLENFUC # strlen | PRINTFFUNC # printf| SCANFFUNC # scanf;
 
 variable_declaration: type IDENTIFIER index*;
-params: BITANDorADDRESS? ( value | IDENTIFIER ) (COMMA BITANDorADDRESS? ( value | IDENTIFIER ) )*;
+params: BITANDorADDRESS? ( expression | IDENTIFIER ) (COMMA BITANDorADDRESS? ( expression | IDENTIFIER ) )*;
 params_definition: variable_declaration (COMMA variable_declaration)*;
 function_call: ( IDENTIFIER  | lib_function ) LROUND params? RROUND;
 
@@ -231,14 +231,14 @@ assignment_operator: ASSIGN # assign
                      | MODULOASSIGN # moduloequal;
 assignment: IDENTIFIER(index)* assignment_operator expression;
 
-variable_definition: ( type | VOID ) assignment;
+variable_definition: ( type | VOID ) assignment ( COMMA assignment )*;
 
 // 生成代码块
 lib_announce: MEMSET # memest_announce
             | STRLEN # strlen_announce
             | PRINTF # printf_announce
             | SCANF # scanf_annouce;
-function_definition: ( type | VOID ) IDENTIFIER LROUND params_definition? RROUND LCURLY code ( RETURN value? SEMICOLON)? RCURLY;
+function_definition: ( type | VOID ) IDENTIFIER LROUND params_definition? RROUND LCURLY code RCURLY;
 
 if_block: IF LROUND expression RROUND code_with_domain
           ( ELIF LROUND expression RROUND code_with_domain )*
@@ -247,7 +247,7 @@ while_block: WHILE LROUND expression RROUND code_with_domain;
 for_block: FOR LROUND ( variable_declaration | variable_definition | assignment | expression )? SEMICOLON expression SEMICOLON ( assignment | expression )? RROUND code_with_domain;
 switch_block: SWITCH LROUND expression RROUND LCURLY (CASE value COLON code)+ RCURLY;
 
-line: ( variable_declaration | variable_definition | assignment | expression | lib_announce | BREAK | CONTINUE ) SEMICOLON | function_definition;
+line: ( variable_declaration | variable_definition | assignment | expression | lib_announce | BREAK | CONTINUE | RETURN expression? ) SEMICOLON | function_definition;
 block: if_block # if | while_block # while | for_block # for | switch_block # switch | line # single | function_definition # function;
 code_with_domain: code # simple_code | LCURLY code RCURLY # domained_code;
 code: block*;

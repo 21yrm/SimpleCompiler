@@ -33,13 +33,14 @@ class Visitor(CgrammerVisitor):
     def visitChildren(self, node):
         current_node = {}
         rule_name = CgrammerParser.ruleNames[node.getRuleIndex()]
-
         children = self.get_children(node)
         if children:
             # current_node[rule_name] = {}
             for child in children:
                 if child.getChildCount() != 0:
-                    current_node[CgrammerParser.ruleNames[child.getRuleIndex()]] = self.visit(child)
+                    if(current_node.get(CgrammerParser.ruleNames[child.getRuleIndex()]) == None):
+                        current_node[CgrammerParser.ruleNames[child.getRuleIndex()]] = []
+                    current_node[CgrammerParser.ruleNames[child.getRuleIndex()]].append(self.visit(child))
                 else:
                     current_node[CgrammerLexer.symbolicNames[child.getPayload().type]] = child.getText()
         else:
@@ -52,7 +53,7 @@ class Visitor(CgrammerVisitor):
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
 
-    arg_parser.add_argument("--path", type=str, default="./C_code/PlalindromeDetection.c")
+    arg_parser.add_argument("--path", type=str, default="./C_code/Calculation.c")
     args = arg_parser.parse_args()
 
     c_file_path = args.path
