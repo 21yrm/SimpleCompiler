@@ -1,32 +1,52 @@
 import argparse
 import os
+import json
 
 from antlr4 import *
-from Cgrammer import Cgrammer
+from CgrammerLexer import CgrammerLexer
+from CgrammerParser import CgrammerParser
+from CgrammerVisitor import CgrammerVisitor
 
 
-def generateTokens(c_file_path):
-    # 读取 C 文件
-    input = FileStream(c_file_path)
+def print_json_tree(json_data, indent=0):
+    if isinstance(json_data, dict):
+        for key, value in json_data.items():
+            print("  " * indent + str(key))
+            print_json_tree(value, indent + 1)
+    elif isinstance(json_data, list):
+        for item in json_data:
+            print_json_tree(item, indent)
+    else:
+        print("  " * indent + str(json_data))
 
-    # 创建词法分析器
-    lexer = Cgrammer(input)
 
-    # 获取词法单元流
-    stream = CommonTokenStream(lexer)
+class Visitor(CgrammerVisitor):
+    def __init__(self):
+        self.tree = {'code': ''}
 
-    # 生成词法单元列表
-    stream.fill()
-    token_list = []
-    for token in stream.tokens:
-        token_list.append({
-            "type": token.type,
-            "text": token.text,
-            "line": token.line,
-            "column": token.column
-        })
+    def get_children(self, node):
+        if node.children is not None:
+            return node.children
+        else:
+            return []
 
-    return token_list
+    def visitChildren(self, node):
+        current_node = {}
+        rule_name = CgrammerParser.ruleNames[node.getRuleIndex()]
+
+        children = self.get_children(node)
+        if children:
+            # current_node[rule_name] = {}
+            for child in children:
+                if child.getChildCount() != 0:
+                    current_node[CgrammerParser.ruleNames[child.getRuleIndex()]] = self.visit(child)
+                else:
+                    current_node[CgrammerLexer.symbolicNames[child.getPayload().type]] = child.getText()
+        else:
+            current_node = node.getText()
+
+        self.tree['code'] = current_node
+        return current_node
 
 
 if __name__ == '__main__':
@@ -39,6 +59,13 @@ if __name__ == '__main__':
     c_file_path: str
     if not c_file_path.endswith(".c") or not os.path.exists(c_file_path):
         raise Exception("Given path is invalid")
-    tokens = generateTokens(c_file_path)
-    for token in tokens:
-        print(token)
+    
+    input_stream = FileStream(c_file_path)
+    lexer = CgrammerLexer(input_stream)
+    stream = CommonTokenStream(lexer)
+    parser = CgrammerParser(stream)
+    visitor = Visitor()
+
+    visitor.visit(parser.code())
+    #print(visitor.tree)
+    print_json_tree(visitor.tree)

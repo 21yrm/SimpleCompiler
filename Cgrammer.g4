@@ -1,13 +1,12 @@
 grammar Cgrammer;
 
-// 库函�?
+// 库函数声明
 MEMSET: 'void *memset(void *s, int ch, size_t n)';
 STRLEN: 'size_t strlen(const char *_Str)';
 PRINTF: 'int printf( const char *restrict format, ... )';
 SCANF: 'int scanf(const char *__format, ...)';
 
 // 变量规则
-IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 FLOATVALUE: [0-9]+'.'[0-9]+;
 INTVALUE: [-+]?([1-9][0-9]* | '0');
 fragment CHARCONTENT: '\''[0rntvbfa?'"\\] | .;
@@ -19,11 +18,11 @@ STRLENFUC: 'strlen';
 PRINTFFUNC: 'printf';
 SCANFFUNC: 'scanf';
 
-// 关键字�?�则
+// 关键字规则
 INT: 'int';
 FLOAT: 'float';
 CHAR: 'char';
-BOOL: 'bool;';
+BOOL: 'bool';
 STRING: 'string';
 CONST: 'const';
 IF: 'if';
@@ -41,7 +40,7 @@ RETURN: 'return';
 VOID: 'void';
 STRUCT: 'struct';
 
-// 运算符�?�则
+// 运算符规则
 EQUAL: '==';
 NOTEQUAL: '!=';
 ASSIGN: '=';
@@ -72,7 +71,7 @@ LSHIFT: '<<';
 RSHIFT: '>>';
 ELLIPSIS: '...';
 
-// 分隔符�?�则
+// 分隔符规则
 SEMICOLON: ';';
 COMMA: ',';
 LROUND: '(';
@@ -83,7 +82,9 @@ LCURLY: '{';
 RCURLY: '}';
 COLON: ':';
 
-// 忽略空白字�?�和注释
+IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
+
+// 忽略空白字符和注释
 WS: [ \t\r\n]+ -> skip;
 COMMENT: '//' ~[\r\n]* '\r'? '\n' -> skip ;
 
@@ -92,12 +93,13 @@ COMMENT: '//' ~[\r\n]* '\r'? '\n' -> skip ;
 announcer: INT # int | FLOAT # float | CHAR # char | BOOL # bool | STRING # string;
 pointer_flag: MULTIPLYorREFERENCEorPTR | MULTIPLYorREFERENCEorPTR pointer_flag;
 type: announcer # originalType| announcer pointer_flag # pointer;
-index: LSQUARE INTVALUE RSQUARE;
+index: LSQUARE ( value | expression | function_call ) RSQUARE;
 lib_function: MEMSETFUNC # memset| STRLENFUC # strlen | PRINTFFUNC # printf| SCANFFUNC # scanf;
 
-variable_declaration: type IDENTIFIER (index)*;
-params: variable_declaration (COMMA variable_declaration)*;
-function_call: IDENTIFIER  | lib_function LROUND params? RROUND;
+variable_declaration: type IDENTIFIER index*;
+params: BITANDorADDRESS? ( value | IDENTIFIER ) (COMMA BITANDorADDRESS? ( value | IDENTIFIER ) )*;
+params_definition: variable_declaration (COMMA variable_declaration)*;
+function_call: ( IDENTIFIER  | lib_function ) LROUND params? RROUND;
 
 value: IDENTIFIER # id
         | INTVALUE # int_value
@@ -229,23 +231,24 @@ assignment_operator: ASSIGN # assign
                      | MODULOASSIGN # moduloequal;
 assignment: IDENTIFIER(index)* assignment_operator expression;
 
-variable_definition: type assignment;
+variable_definition: ( type | VOID ) assignment;
 
-// 生成代码�?
+// 生成代码块
 lib_announce: MEMSET # memest_announce
             | STRLEN # strlen_announce
             | PRINTF # printf_announce
             | SCANF # scanf_annouce;
-function_definition: type IDENTIFIER LROUND params? RROUND LCURLY code ( RETURN value? SEMICOLON)? RCURLY;
+function_definition: ( type | VOID ) IDENTIFIER LROUND params_definition? RROUND LCURLY code ( RETURN value? SEMICOLON)? RCURLY;
 
-if_block: IF LROUND expression RROUND expression LCURLY code RCURLY
-          ( ELIF LROUND expression RROUND LCURLY code RCURLY )*
-          ( ELSE LCURLY code RCURLY )?;
-while_block: WHILE LROUND expression RROUND LCURLY code RCURLY;
-for_block: FOR LROUND (variable_declaration | assignment | expression )? SEMICOLON expression SEMICOLON assignment? RROUND LCURLY code RCURLY;
+if_block: IF LROUND expression RROUND code_with_domain
+          ( ELIF LROUND expression RROUND code_with_domain )*
+          ( ELSE code_with_domain )?;
+while_block: WHILE LROUND expression RROUND code_with_domain;
+for_block: FOR LROUND ( variable_declaration | variable_definition | assignment | expression )? SEMICOLON expression SEMICOLON ( assignment | expression )? RROUND code_with_domain;
 switch_block: SWITCH LROUND expression RROUND LCURLY (CASE value COLON code)+ RCURLY;
 
-line: variable_declaration | variable_definition | assignment | expression | lib_announce | BREAK | CONTINUE SEMICOLON;
+line: ( variable_declaration | variable_definition | assignment | expression | lib_announce | BREAK | CONTINUE ) SEMICOLON | function_definition;
 block: if_block # if | while_block # while | for_block # for | switch_block # switch | line # single | function_definition # function;
+code_with_domain: code # simple_code | LCURLY code RCURLY # domained_code;
 code: block*;
 
