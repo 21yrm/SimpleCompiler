@@ -251,4 +251,3 @@ line: ( variable_declaration | variable_definition | assignment | expression | l
 block: if_block # if | while_block # while | for_block # for | switch_block # switch | line # single | function_definition # function;
 code_with_domain: code # simple_code | LCURLY code RCURLY # domained_code;
 code: block*;
-

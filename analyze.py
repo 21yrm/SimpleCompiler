@@ -38,7 +38,7 @@ class Visitor(CgrammerVisitor):
             # current_node[rule_name] = {}
             for child in children:
                 if child.getChildCount() != 0:
-                    if(current_node.get(CgrammerParser.ruleNames[child.getRuleIndex()]) == None):
+                    if current_node.get(CgrammerParser.ruleNames[child.getRuleIndex()]) is None:
                         current_node[CgrammerParser.ruleNames[child.getRuleIndex()]] = []
                     current_node[CgrammerParser.ruleNames[child.getRuleIndex()]].append(self.visit(child))
                 else:
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     c_file_path: str
     if not c_file_path.endswith(".c") or not os.path.exists(c_file_path):
         raise Exception("Given path is invalid")
-    
+
     input_stream = FileStream(c_file_path)
     lexer = CgrammerLexer(input_stream)
     stream = CommonTokenStream(lexer)
@@ -71,5 +71,5 @@ if __name__ == '__main__':
     visitor = Visitor()
 
     visitor.visit(parser.code())
-    #print(visitor.tree)
+    # print(visitor.tree)
     print_json_tree(visitor.tree)
