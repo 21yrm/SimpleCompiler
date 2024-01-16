@@ -20,7 +20,7 @@ int8_pointer = int8.as_pointer()
 
 class Visitor(CgrammerVisitor):
     """
-    生成器类，用于进行�??义分析并且转化为LLVM
+    生成器类，用于进行�??义分析并且转化为LLVM
     """
 
     def __init__(self):
@@ -31,26 +31,26 @@ class Visitor(CgrammerVisitor):
         self.Module.triple = "x86_64-pc-windows-msvc"
         self.Module.data_layout = "e-m:w-i64:64-f80:128-n8:16:32:64-S128"
 
-        # �?句块
+        # �?句块
         self.Blocks = []
 
-        # 待生成的llvm�?句块
+        # 待生成的llvm�?句块
         self.Builders = []
 
         # 函数列表
         self.Functions = dict()
 
-        # 当前所在函�?
+        # 当前所在函�?
         self.CurrentFunction = ''
         self.Constants = 0
 
-        # 这个变量�?否需要加�?
+        # 这个变量�?否需要加�?
         self.WhetherNeedLoad = True
 
-        # endif�?
+        # endif�?
         self.EndifBlock = None
 
-        # 符号�?
+        # 符号�?
         self.SymbolTable = SymbolTable()
 
         # Visit a parse tree produced by CgrammerParser#int.
@@ -214,7 +214,7 @@ class Visitor(CgrammerVisitor):
                 'name': RealReturnValue,
             }
         else:  # error!
-            raise SemanticError(ctx=ctx, msg="类型错�??")
+            raise SemanticError(ctx=ctx, msg="类型错�??")
 
     # Visit a parse tree produced by CgrammerParser#unit.
     def visitUnit(self, ctx: CgrammerParser.UnitContext):
@@ -296,7 +296,7 @@ class Visitor(CgrammerVisitor):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(Index1, Index2)
+        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
         RealReturnValue = Builder.sdiv(Index1['name'], Index2['name'])
         return {
             'type': Index1['type'],
@@ -312,7 +312,7 @@ class Visitor(CgrammerVisitor):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(Index1, Index2)
+        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
         RealReturnValue = Builder.mul(Index1['name'], Index2['name'])
         return {
             'type': Index1['type'],
@@ -324,7 +324,7 @@ class Visitor(CgrammerVisitor):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(Index1, Index2)
+        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
         RealReturnValue = Builder.srem(Index1['name'], Index2['name'])
         return {
             'type': Index1['type'],
@@ -336,7 +336,7 @@ class Visitor(CgrammerVisitor):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(Index1, Index2)
+        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
         RealReturnValue = Builder.add(Index1['name'], Index2['name'])
         return {
             'type': Index1['type'],
@@ -348,7 +348,7 @@ class Visitor(CgrammerVisitor):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(Index1, Index2)
+        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
         RealReturnValue = Builder.sub(Index1['name'], Index2['name'])
         return {
             'type': Index1['type'],
@@ -363,9 +363,9 @@ class Visitor(CgrammerVisitor):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(Index1, Index2)
+        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
         OperationChar = ctx.getChild(1).getText()
-        if Index1['type'] == double:
+        if Index1['type'] == float32:
             RealReturnValue = Builder.fcmp_ordered(OperationChar, Index1['name'], Index2['name'])
         elif self.isInteger(Index1['type']):
             RealReturnValue = Builder.icmp_signed(OperationChar, Index1['name'], Index2['name'])
@@ -472,7 +472,7 @@ class Visitor(CgrammerVisitor):
         ReturnValue = 'width'
         return hasattr(typ, ReturnValue)
 
-    def exprConvert(self, Index1, Index2):
+    def exprConvert(self, ctx, Index1, Index2):
         if Index1['type'] == Index2['type']:
             return Index1, Index2
         if self.isInteger(Index1['type']) and self.isInteger(Index2['type']):
@@ -486,12 +486,12 @@ class Visitor(CgrammerVisitor):
                     Index2 = self.convertIIZ(Index2, Index1['type'])
                 else:
                     Index2 = self.convertIIS(Index2, Index1['type'])
-        elif self.isInteger(Index1['type']) and Index2['type'] == double:
+        elif self.isInteger(Index1['type']) and Index2['type'] == float32:
             Index1 = self.convertIDS(Index1, Index2['type'])
-        elif self.isInteger(Index2['type']) and Index1['type'] == double:
+        elif self.isInteger(Index2['type']) and Index1['type'] == float32:
             Index2 = self.convertIDS(Index2, Index1['type'])
         else:
-            raise SemanticError(ctx=ctx,msg="类型不匹�?")
+            raise SemanticError(ctx=ctx,msg="类型不匹�?")
         return Index1, Index2
 
     def convertIIZ(self, CalcIndex, DType):
@@ -528,17 +528,17 @@ class Visitor(CgrammerVisitor):
 
     def convertIDS(self, CalcIndex):
         Builder = self.Builders[-1]
-        ConfirmedVal = Builder.sitofp(CalcIndex['name'], double)
+        ConfirmedVal = Builder.sitofp(CalcIndex['name'], float32)
         return {
-                'type': double,
+                'type': float32,
                 'name': ConfirmedVal
         }
 
     def convertIDU(self, CalcIndex):
         Builder = self.Builders[-1]
-        ConfirmedVal = Builder.uitofp(CalcIndex['name'], double)
+        ConfirmedVal = Builder.uitofp(CalcIndex['name'], float32)
         return {
-                'type': double,
+                'type': float32,
                 'name': ConfirmedVal
         }
 
@@ -554,8 +554,8 @@ class Visitor(CgrammerVisitor):
                     'tpye': int1,
                     'name': RealReturnValue
             }
-        elif ManipulateIndex['type'] == double:
-            RealReturnValue = Builder.fcmp_ordered(OperationChar, ManipulateIndex['name'], ir.Constant(double, 0))
+        elif ManipulateIndex['type'] == float32:
+            RealReturnValue = Builder.fcmp_ordered(OperationChar, ManipulateIndex['name'], ir.Constant(float32, 0))
             return {
                     'tpye': int1,
                     'name': RealReturnValue
@@ -585,7 +585,7 @@ class Visitor(CgrammerVisitor):
     # Visit a parse tree produced by CgrammerParser#function_definition.
     def visitFunction_definition(self, ctx: CgrammerParser.Function_definitionContext):
         # function_definition: ( type | VOID ) IDENTIFIER LROUND params_definition? RROUND LCURLY code RCURLY;
-        # 获取返回值类�?
+        # 获取返回值类型?
         if ctx.start.type == CgrammerParser.VOID:
             return_type = void
         else:
@@ -611,37 +611,37 @@ class Visitor(CgrammerVisitor):
         for i in range(len(parameter_list)):
             function.args[i].name = parameter_list[i]['name']
 
-        # 为函数添加基�?�?
+        # 为函数添加基本块
         block = function.append_basic_block(name=function_name + '_entry')
         self.Blocks.append(block)
 
-        # 为函数添加指令工�?
+        # 为函数添加指令工具
         builder = ir.IRBuilder(block)
         self.Builders.append(builder)
 
-        # 为�?�理函数体做准�??
+        # 为处理函数体做准备
         self.CurrentFunction = function_name
         self.SymbolTable.EnterScope()
 
-        # 为形参分配空间并在�?�号表里建立表项
+        # 为形参分配空间并在符号表里建立表项
         for i in range(len(parameter_list)):
-            # 创建一个alloca指令，用于在栈上分配内存，返回一�?指向分配内存的指�?
+            # 创建一个alloca指令，用于在栈上分配内存，返回一个指向分配内存的指针
             address = builder.alloca(parameter_list[i]['type'])
-            # 创建一个load指令，用于加载指针所指的�?
+            # 创建一个load指令，用于加载指针所指的值
             builder.store(function.args[i], address)
-            # 在�?�号表里建立表项
+            # 在符号表里建立表项
             item = {"type": parameter_list[i]['type'], "entry": address}
             result = self.SymbolTable.AddItem(parameter_list[i]['name'], item)
             if result["result"] != "success":
                 raise SemanticError(ctx=ctx, msg=result["reason"])
 
-        # 处理函数�?
+        # 处理函数体
         if ctx.getChildCount() < 8:
             self.visit(ctx.getChild(5))
         else:
             self.visit(ctx.getChild(6))
 
-        # 处理完毕，退一�?
+        # 处理完毕，退一层
         self.CurrentFunction = ''
         self.Blocks.pop()
         self.Builders.pop()
@@ -709,7 +709,7 @@ class Visitor(CgrammerVisitor):
 
 
 class Compiler:
-    # 遍历�?
+    # 遍历�?
     visitor = Visitor()
 
     def compile(self, input_filename, output_filename):
