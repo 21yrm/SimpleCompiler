@@ -3,12 +3,12 @@ from antlr4 import *
 
 
 class SemanticError(Exception):
-    """语义错误基类"""
+    """�?义错�?基类"""
 
     def __init__(self, msg, ctx=None):
         super().__init__()
         if ctx:
-            self.line = ctx.start.line  # 错误出现位置
+            self.line = ctx.start.line  # 错�??出现位置
             self.column = ctx.start.column
         else:
             self.line = 0
@@ -19,10 +19,10 @@ class SemanticError(Exception):
         return "SemanticError: " + str(self.line) + ":" + str(self.column) + " " + self.msg
 
 
-# 语法错误检查与反馈
+# �?法错�?检查与反�??
 class SyntaxErrorListener(ErrorListener):
 
-    # 打印语法错误
+    # 打印�?法错�?
     def syntaxError(self, recognizer, offending_symbol, row, column, msg, e):
         exception = "(row:" + str(row) + ",column:" + str(column) + ") " + msg
         print('SyntaxError: ' + exception)
