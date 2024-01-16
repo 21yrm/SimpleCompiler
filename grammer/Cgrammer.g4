@@ -154,7 +154,7 @@ expr_rop2: expr_rop1 GREATER expr_rop1 # greater
 
 // ����7���߼��� �߼���
 expr_logic: expr_logic AND expr_rop2 # and
-            | expr_logic AND expr_rop2 # or
+            | expr_logic OR expr_rop2 # or
             | expr_rop2 # rop2;
 
 expression: expr_logic;
@@ -190,7 +190,7 @@ statement: variable_declaration # declaration
            | lib_announce # lib_func
            | BREAK # break
            | CONTINUE # continue
-           | RETURN expression # return;
+           | RETURN expression? # return;
 line: statement? SEMICOLON;
 block: if_block # if | while_block # while | for_block # for | switch_block # switch | line # single | function_definition # function;
 code_with_domain: code # simple_code | LCURLY code RCURLY # domained_code;
