@@ -44,15 +44,6 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CgrammerParser#string.
-    def enterString(self, ctx:CgrammerParser.StringContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#string.
-    def exitString(self, ctx:CgrammerParser.StringContext):
-        pass
-
-
     # Enter a parse tree produced by CgrammerParser#pointer_flag.
     def enterPointer_flag(self, ctx:CgrammerParser.Pointer_flagContext):
         pass

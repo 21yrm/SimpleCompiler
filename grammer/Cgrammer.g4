@@ -23,7 +23,6 @@ INT: 'int';
 FLOAT: 'float';
 CHAR: 'char';
 BOOL: 'bool';
-STRING: 'string';
 CONST: 'const';
 IF: 'if';
 ELSE: 'else';
@@ -90,13 +89,13 @@ COMMENT: '//' ~[\r\n]* '\r'? '\n' -> skip ;
 
 // ??��???��
 // �����������??
-announcer: INT # int | FLOAT # float | CHAR # char | BOOL # bool | STRING # string;
-pointer_flag: MULTIPLYorREFERENCEorPTR | MULTIPLYorREFERENCEorPTR pointer_flag;
+announcer: INT # int | FLOAT # float | CHAR # char | BOOL # bool;
+pointer_flag: MULTIPLYorREFERENCEorPTR;
 type: announcer # originalType | announcer pointer_flag # pointer;
 index: LSQUARE ( value | expression | function_call ) RSQUARE;
 lib_function: MEMSETFUNC # memset| STRLENFUC # strlen | PRINTFFUNC # printf| SCANFFUNC # scanf;
 
-variable_declaration: type IDENTIFIER index*;
+variable_declaration: type IDENTIFIER index?;
 params: BITANDorADDRESS? ( expression | IDENTIFIER ) (COMMA BITANDorADDRESS? ( expression | IDENTIFIER ) )*;
 params_definition: variable_declaration (COMMA variable_declaration)*;
 function_call: ( IDENTIFIER  | lib_function ) LROUND params? RROUND;
