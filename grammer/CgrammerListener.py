@@ -233,39 +233,12 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CgrammerParser#value_.
-    def enterValue_(self, ctx:CgrammerParser.Value_Context):
+    # Enter a parse tree produced by CgrammerParser#expr_value.
+    def enterExpr_value(self, ctx:CgrammerParser.Expr_valueContext):
         pass
 
-    # Exit a parse tree produced by CgrammerParser#value_.
-    def exitValue_(self, ctx:CgrammerParser.Value_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#content_of_.
-    def enterContent_of_(self, ctx:CgrammerParser.Content_of_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#content_of_.
-    def exitContent_of_(self, ctx:CgrammerParser.Content_of_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#address_of_.
-    def enterAddress_of_(self, ctx:CgrammerParser.Address_of_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#address_of_.
-    def exitAddress_of_(self, ctx:CgrammerParser.Address_of_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#array_.
-    def enterArray_(self, ctx:CgrammerParser.Array_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#array_.
-    def exitArray_(self, ctx:CgrammerParser.Array_Context):
+    # Exit a parse tree produced by CgrammerParser#expr_value.
+    def exitExpr_value(self, ctx:CgrammerParser.Expr_valueContext):
         pass
 
 
@@ -296,12 +269,30 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CgrammerParser#liecrese.
-    def enterLiecrese(self, ctx:CgrammerParser.LiecreseContext):
+    # Enter a parse tree produced by CgrammerParser#unit.
+    def enterUnit(self, ctx:CgrammerParser.UnitContext):
         pass
 
-    # Exit a parse tree produced by CgrammerParser#liecrese.
-    def exitLiecrese(self, ctx:CgrammerParser.LiecreseContext):
+    # Exit a parse tree produced by CgrammerParser#unit.
+    def exitUnit(self, ctx:CgrammerParser.UnitContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#lincrese.
+    def enterLincrese(self, ctx:CgrammerParser.LincreseContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#lincrese.
+    def exitLincrese(self, ctx:CgrammerParser.LincreseContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#rincrease.
+    def enterRincrease(self, ctx:CgrammerParser.RincreaseContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#rincrease.
+    def exitRincrease(self, ctx:CgrammerParser.RincreaseContext):
         pass
 
 
@@ -311,6 +302,15 @@ class CgrammerListener(ParseTreeListener):
 
     # Exit a parse tree produced by CgrammerParser#ldecrease.
     def exitLdecrease(self, ctx:CgrammerParser.LdecreaseContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#rdecrease.
+    def enterRdecrease(self, ctx:CgrammerParser.RdecreaseContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#rdecrease.
+    def exitRdecrease(self, ctx:CgrammerParser.RdecreaseContext):
         pass
 
 
@@ -341,84 +341,12 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CgrammerParser#next_2.
-    def enterNext_2(self, ctx:CgrammerParser.Next_2Context):
+    # Enter a parse tree produced by CgrammerParser#addr.
+    def enterAddr(self, ctx:CgrammerParser.AddrContext):
         pass
 
-    # Exit a parse tree produced by CgrammerParser#next_2.
-    def exitNext_2(self, ctx:CgrammerParser.Next_2Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#rincrease.
-    def enterRincrease(self, ctx:CgrammerParser.RincreaseContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#rincrease.
-    def exitRincrease(self, ctx:CgrammerParser.RincreaseContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#dincrease.
-    def enterDincrease(self, ctx:CgrammerParser.DincreaseContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#dincrease.
-    def exitDincrease(self, ctx:CgrammerParser.DincreaseContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l2.
-    def enterExpr_l2(self, ctx:CgrammerParser.Expr_l2Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l2.
-    def exitExpr_l2(self, ctx:CgrammerParser.Expr_l2Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#multiply_.
-    def enterMultiply_(self, ctx:CgrammerParser.Multiply_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#multiply_.
-    def exitMultiply_(self, ctx:CgrammerParser.Multiply_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#divide_.
-    def enterDivide_(self, ctx:CgrammerParser.Divide_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#divide_.
-    def exitDivide_(self, ctx:CgrammerParser.Divide_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#modulo_.
-    def enterModulo_(self, ctx:CgrammerParser.Modulo_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#modulo_.
-    def exitModulo_(self, ctx:CgrammerParser.Modulo_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l3_s1.
-    def enterExpr_l3_s1(self, ctx:CgrammerParser.Expr_l3_s1Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l3_s1.
-    def exitExpr_l3_s1(self, ctx:CgrammerParser.Expr_l3_s1Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#multiply.
-    def enterMultiply(self, ctx:CgrammerParser.MultiplyContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#multiply.
-    def exitMultiply(self, ctx:CgrammerParser.MultiplyContext):
+    # Exit a parse tree produced by CgrammerParser#addr.
+    def exitAddr(self, ctx:CgrammerParser.AddrContext):
         pass
 
 
@@ -431,48 +359,30 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CgrammerParser#unary.
+    def enterUnary(self, ctx:CgrammerParser.UnaryContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#unary.
+    def exitUnary(self, ctx:CgrammerParser.UnaryContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#multiply.
+    def enterMultiply(self, ctx:CgrammerParser.MultiplyContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#multiply.
+    def exitMultiply(self, ctx:CgrammerParser.MultiplyContext):
+        pass
+
+
     # Enter a parse tree produced by CgrammerParser#modulo.
     def enterModulo(self, ctx:CgrammerParser.ModuloContext):
         pass
 
     # Exit a parse tree produced by CgrammerParser#modulo.
     def exitModulo(self, ctx:CgrammerParser.ModuloContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l3.
-    def enterExpr_l3(self, ctx:CgrammerParser.Expr_l3Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l3.
-    def exitExpr_l3(self, ctx:CgrammerParser.Expr_l3Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#add_.
-    def enterAdd_(self, ctx:CgrammerParser.Add_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#add_.
-    def exitAdd_(self, ctx:CgrammerParser.Add_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#subtract_.
-    def enterSubtract_(self, ctx:CgrammerParser.Subtract_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#subtract_.
-    def exitSubtract_(self, ctx:CgrammerParser.Subtract_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l4_s1.
-    def enterExpr_l4_s1(self, ctx:CgrammerParser.Expr_l4_s1Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l4_s1.
-    def exitExpr_l4_s1(self, ctx:CgrammerParser.Expr_l4_s1Context):
         pass
 
 
@@ -494,93 +404,12 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CgrammerParser#expr_l4.
-    def enterExpr_l4(self, ctx:CgrammerParser.Expr_l4Context):
+    # Enter a parse tree produced by CgrammerParser#calc1.
+    def enterCalc1(self, ctx:CgrammerParser.Calc1Context):
         pass
 
-    # Exit a parse tree produced by CgrammerParser#expr_l4.
-    def exitExpr_l4(self, ctx:CgrammerParser.Expr_l4Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#lshift_.
-    def enterLshift_(self, ctx:CgrammerParser.Lshift_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#lshift_.
-    def exitLshift_(self, ctx:CgrammerParser.Lshift_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#rshift_.
-    def enterRshift_(self, ctx:CgrammerParser.Rshift_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#rshift_.
-    def exitRshift_(self, ctx:CgrammerParser.Rshift_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l5_s1.
-    def enterExpr_l5_s1(self, ctx:CgrammerParser.Expr_l5_s1Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l5_s1.
-    def exitExpr_l5_s1(self, ctx:CgrammerParser.Expr_l5_s1Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#lshift.
-    def enterLshift(self, ctx:CgrammerParser.LshiftContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#lshift.
-    def exitLshift(self, ctx:CgrammerParser.LshiftContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#rshift.
-    def enterRshift(self, ctx:CgrammerParser.RshiftContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#rshift.
-    def exitRshift(self, ctx:CgrammerParser.RshiftContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l5.
-    def enterExpr_l5(self, ctx:CgrammerParser.Expr_l5Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l5.
-    def exitExpr_l5(self, ctx:CgrammerParser.Expr_l5Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#equal_.
-    def enterEqual_(self, ctx:CgrammerParser.Equal_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#equal_.
-    def exitEqual_(self, ctx:CgrammerParser.Equal_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#nequal_.
-    def enterNequal_(self, ctx:CgrammerParser.Nequal_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#nequal_.
-    def exitNequal_(self, ctx:CgrammerParser.Nequal_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l6_s1.
-    def enterExpr_l6_s1(self, ctx:CgrammerParser.Expr_l6_s1Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l6_s1.
-    def exitExpr_l6_s1(self, ctx:CgrammerParser.Expr_l6_s1Context):
+    # Exit a parse tree produced by CgrammerParser#calc1.
+    def exitCalc1(self, ctx:CgrammerParser.Calc1Context):
         pass
 
 
@@ -602,57 +431,12 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CgrammerParser#expr_l6.
-    def enterExpr_l6(self, ctx:CgrammerParser.Expr_l6Context):
+    # Enter a parse tree produced by CgrammerParser#calc2.
+    def enterCalc2(self, ctx:CgrammerParser.Calc2Context):
         pass
 
-    # Exit a parse tree produced by CgrammerParser#expr_l6.
-    def exitExpr_l6(self, ctx:CgrammerParser.Expr_l6Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#greater_.
-    def enterGreater_(self, ctx:CgrammerParser.Greater_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#greater_.
-    def exitGreater_(self, ctx:CgrammerParser.Greater_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#gequal_.
-    def enterGequal_(self, ctx:CgrammerParser.Gequal_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#gequal_.
-    def exitGequal_(self, ctx:CgrammerParser.Gequal_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#less_.
-    def enterLess_(self, ctx:CgrammerParser.Less_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#less_.
-    def exitLess_(self, ctx:CgrammerParser.Less_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#leuqal_.
-    def enterLeuqal_(self, ctx:CgrammerParser.Leuqal_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#leuqal_.
-    def exitLeuqal_(self, ctx:CgrammerParser.Leuqal_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l7_s1.
-    def enterExpr_l7_s1(self, ctx:CgrammerParser.Expr_l7_s1Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l7_s1.
-    def exitExpr_l7_s1(self, ctx:CgrammerParser.Expr_l7_s1Context):
+    # Exit a parse tree produced by CgrammerParser#calc2.
+    def exitCalc2(self, ctx:CgrammerParser.Calc2Context):
         pass
 
 
@@ -692,138 +476,12 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CgrammerParser#expr_l7.
-    def enterExpr_l7(self, ctx:CgrammerParser.Expr_l7Context):
+    # Enter a parse tree produced by CgrammerParser#rop1.
+    def enterRop1(self, ctx:CgrammerParser.Rop1Context):
         pass
 
-    # Exit a parse tree produced by CgrammerParser#expr_l7.
-    def exitExpr_l7(self, ctx:CgrammerParser.Expr_l7Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#bitnot__.
-    def enterBitnot__(self, ctx:CgrammerParser.Bitnot__Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#bitnot__.
-    def exitBitnot__(self, ctx:CgrammerParser.Bitnot__Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#next_81.
-    def enterNext_81(self, ctx:CgrammerParser.Next_81Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#next_81.
-    def exitNext_81(self, ctx:CgrammerParser.Next_81Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#bitandd_.
-    def enterBitandd_(self, ctx:CgrammerParser.Bitandd_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#bitandd_.
-    def exitBitandd_(self, ctx:CgrammerParser.Bitandd_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#bitor_.
-    def enterBitor_(self, ctx:CgrammerParser.Bitor_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#bitor_.
-    def exitBitor_(self, ctx:CgrammerParser.Bitor_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#bitnot_.
-    def enterBitnot_(self, ctx:CgrammerParser.Bitnot_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#bitnot_.
-    def exitBitnot_(self, ctx:CgrammerParser.Bitnot_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l8_s2.
-    def enterExpr_l8_s2(self, ctx:CgrammerParser.Expr_l8_s2Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l8_s2.
-    def exitExpr_l8_s2(self, ctx:CgrammerParser.Expr_l8_s2Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#bitandd.
-    def enterBitandd(self, ctx:CgrammerParser.BitanddContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#bitandd.
-    def exitBitandd(self, ctx:CgrammerParser.BitanddContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#bitor.
-    def enterBitor(self, ctx:CgrammerParser.BitorContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#bitor.
-    def exitBitor(self, ctx:CgrammerParser.BitorContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#bitnot.
-    def enterBitnot(self, ctx:CgrammerParser.BitnotContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#bitnot.
-    def exitBitnot(self, ctx:CgrammerParser.BitnotContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l8.
-    def enterExpr_l8(self, ctx:CgrammerParser.Expr_l8Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l8.
-    def exitExpr_l8(self, ctx:CgrammerParser.Expr_l8Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#and_.
-    def enterAnd_(self, ctx:CgrammerParser.And_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#and_.
-    def exitAnd_(self, ctx:CgrammerParser.And_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#or_.
-    def enterOr_(self, ctx:CgrammerParser.Or_Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#or_.
-    def exitOr_(self, ctx:CgrammerParser.Or_Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#expr_l9_s1.
-    def enterExpr_l9_s1(self, ctx:CgrammerParser.Expr_l9_s1Context):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#expr_l9_s1.
-    def exitExpr_l9_s1(self, ctx:CgrammerParser.Expr_l9_s1Context):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#and.
-    def enterAnd(self, ctx:CgrammerParser.AndContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#and.
-    def exitAnd(self, ctx:CgrammerParser.AndContext):
+    # Exit a parse tree produced by CgrammerParser#rop1.
+    def exitRop1(self, ctx:CgrammerParser.Rop1Context):
         pass
 
 
@@ -836,12 +494,21 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CgrammerParser#expr_l9.
-    def enterExpr_l9(self, ctx:CgrammerParser.Expr_l9Context):
+    # Enter a parse tree produced by CgrammerParser#and.
+    def enterAnd(self, ctx:CgrammerParser.AndContext):
         pass
 
-    # Exit a parse tree produced by CgrammerParser#expr_l9.
-    def exitExpr_l9(self, ctx:CgrammerParser.Expr_l9Context):
+    # Exit a parse tree produced by CgrammerParser#and.
+    def exitAnd(self, ctx:CgrammerParser.AndContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#rop2.
+    def enterRop2(self, ctx:CgrammerParser.Rop2Context):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#rop2.
+    def exitRop2(self, ctx:CgrammerParser.Rop2Context):
         pass
 
 
@@ -1004,6 +671,78 @@ class CgrammerListener(ParseTreeListener):
 
     # Exit a parse tree produced by CgrammerParser#switch_block.
     def exitSwitch_block(self, ctx:CgrammerParser.Switch_blockContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#declaration.
+    def enterDeclaration(self, ctx:CgrammerParser.DeclarationContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#declaration.
+    def exitDeclaration(self, ctx:CgrammerParser.DeclarationContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#definition.
+    def enterDefinition(self, ctx:CgrammerParser.DefinitionContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#definition.
+    def exitDefinition(self, ctx:CgrammerParser.DefinitionContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#assign_state.
+    def enterAssign_state(self, ctx:CgrammerParser.Assign_stateContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#assign_state.
+    def exitAssign_state(self, ctx:CgrammerParser.Assign_stateContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#expr.
+    def enterExpr(self, ctx:CgrammerParser.ExprContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#expr.
+    def exitExpr(self, ctx:CgrammerParser.ExprContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#lib_func.
+    def enterLib_func(self, ctx:CgrammerParser.Lib_funcContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#lib_func.
+    def exitLib_func(self, ctx:CgrammerParser.Lib_funcContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#break.
+    def enterBreak(self, ctx:CgrammerParser.BreakContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#break.
+    def exitBreak(self, ctx:CgrammerParser.BreakContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#continue.
+    def enterContinue(self, ctx:CgrammerParser.ContinueContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#continue.
+    def exitContinue(self, ctx:CgrammerParser.ContinueContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#return.
+    def enterReturn(self, ctx:CgrammerParser.ReturnContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#return.
+    def exitReturn(self, ctx:CgrammerParser.ReturnContext):
         pass
 
 

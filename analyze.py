@@ -3,9 +3,9 @@ import os
 import json
 
 from antlr4 import *
-from CgrammerLexer import CgrammerLexer
-from CgrammerParser import CgrammerParser
-from CgrammerVisitor import CgrammerVisitor
+from grammer.CgrammerLexer import CgrammerLexer
+from grammer.CgrammerParser import CgrammerParser
+from grammer.CgrammerVisitor import CgrammerVisitor
 
 
 def print_json_tree(json_data, indent=0):

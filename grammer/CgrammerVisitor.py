@@ -134,23 +134,8 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CgrammerParser#value_.
-    def visitValue_(self, ctx:CgrammerParser.Value_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#content_of_.
-    def visitContent_of_(self, ctx:CgrammerParser.Content_of_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#address_of_.
-    def visitAddress_of_(self, ctx:CgrammerParser.Address_of_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#array_.
-    def visitArray_(self, ctx:CgrammerParser.Array_Context):
+    # Visit a parse tree produced by CgrammerParser#expr_value.
+    def visitExpr_value(self, ctx:CgrammerParser.Expr_valueContext):
         return self.visitChildren(ctx)
 
 
@@ -169,13 +154,28 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CgrammerParser#liecrese.
-    def visitLiecrese(self, ctx:CgrammerParser.LiecreseContext):
+    # Visit a parse tree produced by CgrammerParser#unit.
+    def visitUnit(self, ctx:CgrammerParser.UnitContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#lincrese.
+    def visitLincrese(self, ctx:CgrammerParser.LincreseContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#rincrease.
+    def visitRincrease(self, ctx:CgrammerParser.RincreaseContext):
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by CgrammerParser#ldecrease.
     def visitLdecrease(self, ctx:CgrammerParser.LdecreaseContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#rdecrease.
+    def visitRdecrease(self, ctx:CgrammerParser.RdecreaseContext):
         return self.visitChildren(ctx)
 
 
@@ -194,48 +194,8 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CgrammerParser#next_2.
-    def visitNext_2(self, ctx:CgrammerParser.Next_2Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#rincrease.
-    def visitRincrease(self, ctx:CgrammerParser.RincreaseContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#dincrease.
-    def visitDincrease(self, ctx:CgrammerParser.DincreaseContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l2.
-    def visitExpr_l2(self, ctx:CgrammerParser.Expr_l2Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#multiply_.
-    def visitMultiply_(self, ctx:CgrammerParser.Multiply_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#divide_.
-    def visitDivide_(self, ctx:CgrammerParser.Divide_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#modulo_.
-    def visitModulo_(self, ctx:CgrammerParser.Modulo_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l3_s1.
-    def visitExpr_l3_s1(self, ctx:CgrammerParser.Expr_l3_s1Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#multiply.
-    def visitMultiply(self, ctx:CgrammerParser.MultiplyContext):
+    # Visit a parse tree produced by CgrammerParser#addr.
+    def visitAddr(self, ctx:CgrammerParser.AddrContext):
         return self.visitChildren(ctx)
 
 
@@ -244,28 +204,18 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by CgrammerParser#unary.
+    def visitUnary(self, ctx:CgrammerParser.UnaryContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#multiply.
+    def visitMultiply(self, ctx:CgrammerParser.MultiplyContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by CgrammerParser#modulo.
     def visitModulo(self, ctx:CgrammerParser.ModuloContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l3.
-    def visitExpr_l3(self, ctx:CgrammerParser.Expr_l3Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#add_.
-    def visitAdd_(self, ctx:CgrammerParser.Add_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#subtract_.
-    def visitSubtract_(self, ctx:CgrammerParser.Subtract_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l4_s1.
-    def visitExpr_l4_s1(self, ctx:CgrammerParser.Expr_l4_s1Context):
         return self.visitChildren(ctx)
 
 
@@ -279,53 +229,8 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CgrammerParser#expr_l4.
-    def visitExpr_l4(self, ctx:CgrammerParser.Expr_l4Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#lshift_.
-    def visitLshift_(self, ctx:CgrammerParser.Lshift_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#rshift_.
-    def visitRshift_(self, ctx:CgrammerParser.Rshift_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l5_s1.
-    def visitExpr_l5_s1(self, ctx:CgrammerParser.Expr_l5_s1Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#lshift.
-    def visitLshift(self, ctx:CgrammerParser.LshiftContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#rshift.
-    def visitRshift(self, ctx:CgrammerParser.RshiftContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l5.
-    def visitExpr_l5(self, ctx:CgrammerParser.Expr_l5Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#equal_.
-    def visitEqual_(self, ctx:CgrammerParser.Equal_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#nequal_.
-    def visitNequal_(self, ctx:CgrammerParser.Nequal_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l6_s1.
-    def visitExpr_l6_s1(self, ctx:CgrammerParser.Expr_l6_s1Context):
+    # Visit a parse tree produced by CgrammerParser#calc1.
+    def visitCalc1(self, ctx:CgrammerParser.Calc1Context):
         return self.visitChildren(ctx)
 
 
@@ -339,33 +244,8 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CgrammerParser#expr_l6.
-    def visitExpr_l6(self, ctx:CgrammerParser.Expr_l6Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#greater_.
-    def visitGreater_(self, ctx:CgrammerParser.Greater_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#gequal_.
-    def visitGequal_(self, ctx:CgrammerParser.Gequal_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#less_.
-    def visitLess_(self, ctx:CgrammerParser.Less_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#leuqal_.
-    def visitLeuqal_(self, ctx:CgrammerParser.Leuqal_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l7_s1.
-    def visitExpr_l7_s1(self, ctx:CgrammerParser.Expr_l7_s1Context):
+    # Visit a parse tree produced by CgrammerParser#calc2.
+    def visitCalc2(self, ctx:CgrammerParser.Calc2Context):
         return self.visitChildren(ctx)
 
 
@@ -389,78 +269,8 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CgrammerParser#expr_l7.
-    def visitExpr_l7(self, ctx:CgrammerParser.Expr_l7Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#bitnot__.
-    def visitBitnot__(self, ctx:CgrammerParser.Bitnot__Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#next_81.
-    def visitNext_81(self, ctx:CgrammerParser.Next_81Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#bitandd_.
-    def visitBitandd_(self, ctx:CgrammerParser.Bitandd_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#bitor_.
-    def visitBitor_(self, ctx:CgrammerParser.Bitor_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#bitnot_.
-    def visitBitnot_(self, ctx:CgrammerParser.Bitnot_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l8_s2.
-    def visitExpr_l8_s2(self, ctx:CgrammerParser.Expr_l8_s2Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#bitandd.
-    def visitBitandd(self, ctx:CgrammerParser.BitanddContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#bitor.
-    def visitBitor(self, ctx:CgrammerParser.BitorContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#bitnot.
-    def visitBitnot(self, ctx:CgrammerParser.BitnotContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l8.
-    def visitExpr_l8(self, ctx:CgrammerParser.Expr_l8Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#and_.
-    def visitAnd_(self, ctx:CgrammerParser.And_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#or_.
-    def visitOr_(self, ctx:CgrammerParser.Or_Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#expr_l9_s1.
-    def visitExpr_l9_s1(self, ctx:CgrammerParser.Expr_l9_s1Context):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#and.
-    def visitAnd(self, ctx:CgrammerParser.AndContext):
+    # Visit a parse tree produced by CgrammerParser#rop1.
+    def visitRop1(self, ctx:CgrammerParser.Rop1Context):
         return self.visitChildren(ctx)
 
 
@@ -469,8 +279,13 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CgrammerParser#expr_l9.
-    def visitExpr_l9(self, ctx:CgrammerParser.Expr_l9Context):
+    # Visit a parse tree produced by CgrammerParser#and.
+    def visitAnd(self, ctx:CgrammerParser.AndContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#rop2.
+    def visitRop2(self, ctx:CgrammerParser.Rop2Context):
         return self.visitChildren(ctx)
 
 
@@ -561,6 +376,46 @@ class CgrammerVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by CgrammerParser#switch_block.
     def visitSwitch_block(self, ctx:CgrammerParser.Switch_blockContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#declaration.
+    def visitDeclaration(self, ctx:CgrammerParser.DeclarationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#definition.
+    def visitDefinition(self, ctx:CgrammerParser.DefinitionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#assign_state.
+    def visitAssign_state(self, ctx:CgrammerParser.Assign_stateContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#expr.
+    def visitExpr(self, ctx:CgrammerParser.ExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#lib_func.
+    def visitLib_func(self, ctx:CgrammerParser.Lib_funcContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#break.
+    def visitBreak(self, ctx:CgrammerParser.BreakContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#continue.
+    def visitContinue(self, ctx:CgrammerParser.ContinueContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#return.
+    def visitReturn(self, ctx:CgrammerParser.ReturnContext):
         return self.visitChildren(ctx)
 
 
