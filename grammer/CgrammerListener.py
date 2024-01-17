@@ -638,6 +638,15 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CgrammerParser#condition.
+    def enterCondition(self, ctx:CgrammerParser.ConditionContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#condition.
+    def exitCondition(self, ctx:CgrammerParser.ConditionContext):
+        pass
+
+
     # Enter a parse tree produced by CgrammerParser#if_block.
     def enterIf_block(self, ctx:CgrammerParser.If_blockContext):
         pass

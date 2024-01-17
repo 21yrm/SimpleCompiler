@@ -96,7 +96,7 @@ type: announcer # originalType | announcer pointer_flag # pointer;
 index: LSQUARE ( value | expression | function_call ) RSQUARE;
 lib_function: MEMSETFUNC # memset| STRLENFUC # strlen | PRINTFFUNC # printf| SCANFFUNC # scanf;
 
-variable_declaration: type IDENTIFIER index*;
+variable_declaration: type IDENTIFIER index?;
 params: BITANDorADDRESS? ( expression | IDENTIFIER ) (COMMA BITANDorADDRESS? ( expression | IDENTIFIER ) )*;
 params_definition: variable_declaration (COMMA variable_declaration)*;
 function_call: ( IDENTIFIER  | lib_function ) LROUND params? RROUND;

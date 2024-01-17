@@ -359,6 +359,11 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by CgrammerParser#condition.
+    def visitCondition(self, ctx:CgrammerParser.ConditionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by CgrammerParser#if_block.
     def visitIf_block(self, ctx:CgrammerParser.If_blockContext):
         return self.visitChildren(ctx)
