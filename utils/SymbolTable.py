@@ -38,8 +38,7 @@ class SymbolTable:
         返回：成功{"result":"success"}，失败{"result":"fail","reason":具体原因码}
         """
         if key in self.Table[self.CurrentLevel]:
-            result = {"result": "fail", "reason": Constants.ERROR_TYPE_REDEFINITION}
-            return result
+            return {"result": "fail", "reason": Constants.ERROR_TYPE_REDEFINITION}
         self.Table[self.CurrentLevel][key] = value
         return {"result": "success"}
 
@@ -109,10 +108,8 @@ class Structure:
         """
         # 处理这个错误
         if name in self.List:
-            result = {"result": "fail", "reason": Constants.ERROR_TYPE_REDEFINITION}
-            return result
-        struct = {"Members": member_list, "Type": ir.LiteralStructType(type_list)}
-        self.List[name] = struct
+            return {"result": "fail", "reason": Constants.ERROR_TYPE_REDEFINITION}
+        self.List[name] = {"Members": member_list, "Type": ir.LiteralStructType(type_list)}
         return {"result": "success"}
 
     def GetMemberType(self, name, member):

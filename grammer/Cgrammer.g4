@@ -175,11 +175,16 @@ lib_announce: MEMSET # memest_announce
             | SCANF # scanf_annouce;
 function_definition: ( type | VOID ) IDENTIFIER LROUND params_definition? RROUND LCURLY code RCURLY;
 
-if_block: IF LROUND expression RROUND code_with_domain
-          ( ELIF LROUND expression RROUND code_with_domain )*
-          ( ELSE code_with_domain )?;
-while_block: WHILE LROUND expression RROUND code_with_domain;
-for_block: FOR LROUND ( variable_declaration | variable_definition | assignment | expression )? SEMICOLON expression SEMICOLON ( assignment | expression )? RROUND code_with_domain;
+condition:  expression;
+
+if_block: pure_if_block elif_block* else_block?;
+pure_if_block: IF LROUND condition RROUND code_with_domain;
+elif_block: ELIF LROUND condition RROUND code_with_domain;
+else_block: ELSE code_with_domain;
+while_block: WHILE LROUND condition RROUND code_with_domain;
+for_block: FOR LROUND for_var SEMICOLON condition SEMICOLON for_iter RROUND code_with_domain;
+for_var: ( variable_declaration | variable_definition | assignment | expression )?;
+for_iter: ( assignment | expression )?;
 switch_block: SWITCH LROUND expression RROUND LCURLY (CASE value COLON code)+ RCURLY;
 
 statement: variable_declaration # declaration
@@ -191,6 +196,9 @@ statement: variable_declaration # declaration
            | CONTINUE # continue
            | RETURN expression? # return;
 line: statement? SEMICOLON;
-block: if_block # if | while_block # while | for_block # for | switch_block # switch | line # single | function_definition # function;
+
+block: if_block | while_block | for_block | switch_block | line;
 code_with_domain: code # simple_code | LCURLY code RCURLY # domained_code;
 code: block*;
+
+program: ((lib_announce | variable_declaration | variable_definition) SEMICOLON)* function_definition+;
