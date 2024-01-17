@@ -2,7 +2,7 @@ import llvmlite.ir as ir
 import llvmlite.binding as llvm
 import ctypes
 
-# 初始化 LLVM
+# 初�?�化 LLVM
 llvm.initialize()
 llvm.initialize_native_target()
 llvm.initialize_native_asmprinter()
@@ -11,11 +11,11 @@ llvm.initialize_native_asmprinter()
 context = ir.Context()
 module = ir.Module(name="my_module")
 
-# 创建主函数类型
+# 创建主函数类�?
 main_type = ir.FunctionType(ir.IntType(32), [])
 main_func = ir.Function(module, main_type, name="main")
 
-# 创建主函数的基本块
+# 创建主函数的基本�?
 entry_block = main_func.append_basic_block(name="entry")
 
 # 使用指令生成器在基本块中插入指令
@@ -26,7 +26,7 @@ a = builder.alloca(ir.IntType(32), name="a")
 b = builder.alloca(ir.IntType(32), name="b")
 c = builder.alloca(ir.IntType(32), name="c")
 
-# 初始化变量a和b
+# 初�?�化变量a和b
 builder.store(ir.Constant(ir.IntType(32), 5), a)
 builder.store(ir.Constant(ir.IntType(32), 10), b)
 
@@ -58,7 +58,7 @@ engine.add_module(mod)
 engine.finalize_object()
 engine.run_static_constructors()
 
-# 获取主函数指针并执行
+# 获取主函数指针并执�??
 func_ptr = engine.get_function_address("main")
 c_func = ctypes.CFUNCTYPE(ctypes.c_int)(func_ptr)
 result = c_func()

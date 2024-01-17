@@ -4,19 +4,15 @@ from grammer.CgrammerLexer import CgrammerLexer
 from grammer.CgrammerParser import CgrammerParser
 from grammer.CgrammerVisitor import CgrammerVisitor
 from SymbolTable import SymbolTable, Structure
-from ErrorListener import SyntaxErrorListener
-from ErrorListener import SemanticError
 
-float32 = ir.FloatType()
+# from Generator.ErrorListener import syntaxErrorListener
+# from Generator.ErrorListener import SemanticError
+
+double = ir.DoubleType()
 int1 = ir.IntType(1)
 int32 = ir.IntType(32)
 int8 = ir.IntType(8)
 void = ir.VoidType()
-float32_pointer = float32.as_pointer()
-int1_pointer = int1.as_pointer()
-int32_pointer = int32.as_pointer()
-int8_pointer = int8.as_pointer()
-
 
 class Visitor(CgrammerVisitor):
     """
@@ -31,26 +27,26 @@ class Visitor(CgrammerVisitor):
         self.Module.triple = "x86_64-pc-windows-msvc"
         self.Module.data_layout = "e-m:w-i64:64-f80:128-n8:16:32:64-S128"
 
-        # �?句块
+        # �??句块
         self.Blocks = []
 
-        # 待生成的llvm�?句块
+        # 待生成的llvm�??句块
         self.Builders = []
 
         # 函数列表
         self.Functions = dict()
 
-        # 当前所在函�?
+        # 当前所在函�??
         self.CurrentFunction = ''
         self.Constants = 0
 
-        # 这个变量�?否需要加�?
+        # 这个变量�??否需要加�??
         self.WhetherNeedLoad = True
 
-        # endif�?
+        # endif�??
         self.EndifBlock = None
 
-        # 符号�?
+        # 符号�??
         self.SymbolTable = SymbolTable()
 
     # 入口符号 Program
@@ -73,19 +69,19 @@ class Visitor(CgrammerVisitor):
         self.visit(ctx.getChild(0))
         return
 
-    # 代码块 Block，可能为if、while、for、switch、function和line
+    # 代码�? Block，可能为if、while、for、switch、function和line
     def visitBlock(self, ctx: CgrammerParser.BlockContext):
         self.visit(ctx.getChild(0))
         return None
 
-    # TODO:条件语句
+    # TODO:条件�?�?
     def visitCondition(self, ctx: CgrammerParser.ConditionContext):
         result = self.visit(ctx.getChild(0))
         return self.toBoolean(result, notFlag=False)
 
     # 具体代码块：if
     def visitIf_block(self, ctx: CgrammerParser.If_blockContext):
-        # 增加两个block，对应If的内容 和 If结束后的内容
+        # 增加两个block，�?�应If的内�? �? If结束后的内�??
         curBuilder = self.Builders[-1]
         IfBlock = curBuilder.append_basic_block()
         EndifBlock = curBuilder.append_basic_block()
@@ -101,10 +97,10 @@ class Visitor(CgrammerVisitor):
         self.EndifBlock = EndifBlock
         Length = ctx.getChildCount()
         for i in range(Length):
-            self.visit(ctx.getChild(i))  # 分别处理每个if ,elseif, else块
+            self.visit(ctx.getChild(i))  # 分别处理每个if ,elseif, else�?
         self.EndifBlock = tmpBlock
 
-        # 结束后导向EndIf块
+        # 结束后�?�向EndIf�?
         tmpBlock = self.Blocks.pop()
         tmpBuilder = self.Builders.pop()
         if not tmpBlock.is_terminated:
@@ -114,9 +110,9 @@ class Visitor(CgrammerVisitor):
         self.Builders.append(ir.IRBuilder(EndifBlock))
         return
 
-    # if子块：首个if
+    # if子块：�?�个if
     def visitPure_if_block(self, ctx: CgrammerParser.Pure_if_blockContext):
-        # 创建真块与假块
+        # 创建真块与假�?
         self.SymbolTable.EnterScope()
         curBuilder = self.Builders[-1]
         TrueBlock = curBuilder.append_basic_block()
@@ -126,7 +122,7 @@ class Visitor(CgrammerVisitor):
         result = self.visit(ctx.getChild(2))
         curBuilder.cbranch(result['name'], TrueBlock, FalseBlock)
 
-        # 处理TrueBlock，对应code
+        # 处理TrueBlock，�?�应code
         self.Blocks.pop()
         self.Builders.pop()
         self.Blocks.append(TrueBlock)
@@ -136,7 +132,7 @@ class Visitor(CgrammerVisitor):
         if not self.Blocks[-1].is_terminated:
             self.Builders[-1].branch(self.EndifBlock)
 
-        # 处理FlaseBlock，对应后续操作
+        # 处理FlaseBlock，�?�应后续操作
         self.Blocks.pop()
         self.Builders.pop()
         self.Blocks.append(FalseBlock)
@@ -146,7 +142,7 @@ class Visitor(CgrammerVisitor):
 
     # if子块：elif
     def visitElif_block(self, ctx: CgrammerParser.IntContext):
-        # 创建真块与假块
+        # 创建真块与假�?
         self.SymbolTable.EnterScope()
         curBuilder = self.Builders[-1]
         TrueBlock = curBuilder.append_basic_block()
@@ -156,7 +152,7 @@ class Visitor(CgrammerVisitor):
         result = self.visit(ctx.getChild(2))
         curBuilder.cbranch(result['name'], TrueBlock, FalseBlock)
 
-        # 处理TrueBlock，对应code
+        # 处理TrueBlock，�?�应code
         self.Blocks.pop()
         self.Builders.pop()
         self.Blocks.append(TrueBlock)
@@ -166,7 +162,7 @@ class Visitor(CgrammerVisitor):
         if not self.Blocks[-1].is_terminated:
             self.Builders[-1].branch(self.EndifBlock)
 
-        # 处理FlaseBlock，对应后续操作
+        # 处理FlaseBlock，�?�应后续操作
         self.Blocks.pop()
         self.Builders.pop()
         self.Blocks.append(FalseBlock)
@@ -183,14 +179,14 @@ class Visitor(CgrammerVisitor):
 
     # 具体代码块：while
     def visitWhile_block(self, ctx: CgrammerParser.While_blockContext):
-        # 创建条件块，执行块与跳出块
+        # 创建条件块，执�?�块与跳出块
         self.SymbolTable.EnterScope()
         curBuilder = self.Builders[-1]
         condBlock = curBuilder.append_basic_block()
         doBlock = curBuilder.append_basic_block()
         endBlock = curBuilder.append_basic_block()
 
-        # 处理condBlock，对应expression
+        # 处理condBlock，�?�应expression
         curBuilder.branch(condBlock)
         self.Blocks.pop()
         self.Builders.pop()
@@ -199,18 +195,18 @@ class Visitor(CgrammerVisitor):
         result = self.visit(ctx.getChild(2))
         self.Builders[-1].cbranch(result['name'], doBlock, endBlock)
 
-        # 处理doBlock，对应code
+        # 处理doBlock，�?�应code
         self.Blocks.pop()
         self.Builders.pop()
         self.Blocks.append(doBlock)
         self.Builders.append(ir.IRBuilder(doBlock))
         self.visit(ctx.getChild(4))  # body
 
-        # do后跳转回条件判断
+        # do后跳�?回条件判�?
         if not self.Blocks[-1].is_terminated:
             self.Builders[-1].branch(condBlock)
 
-        # 处理endBlock，对应后续操作
+        # 处理endBlock，�?�应后续操作
         self.Blocks.pop()
         self.Builders.pop()
         self.Blocks.append(endBlock)
@@ -222,7 +218,7 @@ class Visitor(CgrammerVisitor):
     def visitFor_block(self, ctx: CgrammerParser.For_blockContext):
         self.SymbolTable.EnterScope()
 
-        # 创建条件块，执行块和跳出块
+        # 创建条件块，执�?�块和跳出块
         curBuilder = self.Builders[-1]
         varBlock = curBuilder.append_basic_block()
         condBlock = curBuilder.append_basic_block()
@@ -237,7 +233,7 @@ class Visitor(CgrammerVisitor):
         self.Builders.append(ir.IRBuilder(varBlock))
         self.visit(ctx.getChild(2))
 
-        # 处理condBlock，跳转条件
+        # 处理condBlock，跳�?条件
         self.Blocks.pop()
         self.Builders.pop()
         self.Blocks.append(condBlock)
@@ -246,7 +242,7 @@ class Visitor(CgrammerVisitor):
         result = self.visit(ctx.getChild(4))  # condition block
         self.Builders[-1].cbranch(result['name'], doBlock, endBlock)
 
-        # 处理doblock，对应code与iter两部分
+        # 处理doblock，�?�应code与iter两部�?
         self.Blocks.pop()
         self.Builders.pop()
         self.Blocks.append(doBlock)
@@ -254,11 +250,11 @@ class Visitor(CgrammerVisitor):
         self.visit(ctx.getChild(7))  # code
         self.visit(ctx.getChild(5))  # iter
 
-        # do后跳转回条件判断
+        # do后跳�?回条件判�?
         if not self.Blocks[-1].is_terminated:
             self.Builders[-1].branch(condBlock)
 
-        # 处理endBlock，对应后续操作
+        # 处理endBlock，�?�应后续操作
         self.Blocks.pop()
         self.Builders.pop()
         self.Blocks.append(endBlock)
@@ -288,6 +284,241 @@ class Visitor(CgrammerVisitor):
     def visitSwitch_block(self, ctx: CgrammerParser.Switch_blockContext):
         return self.visitChildren(ctx)
 
+    # 入口符号 Program
+    def visitProgram(self, ctx:CgrammerParser.CodeContext):
+        for i in range(ctx.getChildCount()):
+            self.visit(ctx.getChild(i))
+        return
+    
+    # 代码入口 code
+    def visitCode(self, ctx:CgrammerParser.CodeContext):
+        for i in range(ctx.getChildCount()):
+            self.visit(ctx.getChild(i))
+        return
+
+    def visitDomained_code(self, ctx:CgrammerParser.Domained_codeContext):
+        self.visit(ctx.getChild(1))
+        return
+
+    def visitSimple_code(self, ctx: CgrammerParser.Simple_codeContext):
+        self.visit(ctx.getChild(0))
+        return
+
+    # 代码�? Block，可能为if、while、for、switch、function和line
+    def visitBlock(self, ctx:CgrammerParser.BlockContext):
+        self.visit(ctx.getChild(0))
+        return None
+
+    # TODO:条件�?�?
+    def visitCondition(self, ctx:CgrammerParser.ConditionContext):
+        result = self.visit(ctx.getChild(0))
+        return self.toBoolean(result, notFlag=False)
+
+    # 具体代码块：if
+    def visitIf_block(self, ctx:CgrammerParser.If_blockContext):
+        # 增加两个block，�?�应If的内�? �? If结束后的内�??
+        curBuilder = self.Builders[-1] 
+        IfBlock = curBuilder.append_basic_block()
+        EndifBlock = curBuilder.append_basic_block()
+        curBuilder.branch(IfBlock)
+
+        # 纳入if
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(IfBlock)
+        self.Builders.append(ir.IRBuilder(IfBlock))
+
+        tmpBlock = self.EndifBlock
+        self.EndifBlock = EndifBlock
+        Length = ctx.getChildCount()
+        for i in range(Length):
+            self.visit(ctx.getChild(i))  # 分别处理每个if ,elseif, else�?
+        self.EndifBlock = tmpBlock
+
+        # 结束后�?�向EndIf�?
+        tmpBlock = self.Blocks.pop()
+        tmpBuilder = self.Builders.pop()
+        if not tmpBlock.is_terminated:
+            tmpBuilder.branch(EndifBlock)
+
+        self.Blocks.append(EndifBlock)
+        self.Builders.append(ir.IRBuilder(EndifBlock))
+        return
+
+    # if子块：�?�个if
+    def visitPure_if_block(self, ctx:CgrammerParser.Pure_if_blockContext):
+        # 创建真块与假�?
+        self.SymbolTable.EnterScope()
+        curBuilder = self.Builders[-1]
+        TrueBlock = curBuilder.append_basic_block()
+        FalseBlock = curBuilder.append_basic_block()
+
+        # 由condition选择跳转
+        result = self.visit(ctx.getChild(2))
+        curBuilder.cbranch(result['name'], TrueBlock, FalseBlock)
+
+        # 处理TrueBlock，�?�应code
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(TrueBlock)
+        self.Builders.append(ir.IRBuilder(TrueBlock))
+        self.visit(ctx.getChild(4))
+
+        if not self.Blocks[-1].is_terminated:
+            self.Builders[-1].branch(self.EndifBlock)
+
+        # 处理FlaseBlock，�?�应后续操作
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(FalseBlock)
+        self.Builders.append(ir.IRBuilder(FalseBlock))
+        self.SymbolTable.QuitScope()
+        return
+
+    # if子块：elif
+    def visitElif_block(self, ctx:CgrammerParser.IntContext):
+        # 创建真块与假�?
+        self.SymbolTable.EnterScope()
+        curBuilder = self.Builders[-1]
+        TrueBlock = curBuilder.append_basic_block()
+        FalseBlock = curBuilder.append_basic_block()
+
+        # 由condition选择跳转
+        result = self.visit(ctx.getChild(2))
+        curBuilder.cbranch(result['name'], TrueBlock, FalseBlock)
+        
+        # 处理TrueBlock，�?�应code
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(TrueBlock)
+        self.Builders.append(ir.IRBuilder(TrueBlock))
+        self.visit(ctx.getChild(4))
+
+        if not self.Blocks[-1].is_terminated:
+            self.Builders[-1].branch(self.EndifBlock)
+        
+        # 处理FlaseBlock，�?�应后续操作
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(FalseBlock)
+        self.Builders.append(ir.IRBuilder(FalseBlock))
+        self.SymbolTable.QuitScope()
+        return
+
+    # if子块：else
+    def visitElse_block(self, ctx:CgrammerParser.Else_blockContext):
+        # 直接生成
+        self.SymbolTable.EnterScope()
+        self.visit(ctx.getChild(2)) # body
+        self.SymbolTable.QuitScope()
+
+    # 具体代码块：while
+    def visitWhile_block(self, ctx:CgrammerParser.While_blockContext):
+        # 创建条件块，执�?�块与跳出块
+        self.SymbolTable.EnterScope()
+        curBuilder = self.Builders[-1]
+        condBlock = curBuilder.append_basic_block()
+        doBlock = curBuilder.append_basic_block()
+        endBlock = curBuilder.append_basic_block()
+
+        # 处理condBlock，�?�应expression
+        curBuilder.branch(condBlock)
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(condBlock)
+        self.Builders.append(ir.IRBuildercondBlock)
+        result = self.visit(ctx.getChild(2))
+        self.Builders[-1].cbranch(result['name'], doBlock, endBlock)
+
+        # 处理doBlock，�?�应code
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(doBlock)
+        self.Builders.append(ir.IRBuilder(doBlock))
+        self.visit(ctx.getChild(4)) # body
+
+        # do后跳�?回条件判�?
+        if not self.Blocks[-1].is_terminated:
+            self.Builders[-1].branch(condBlock)
+
+        # 处理endBlock，�?�应后续操作
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(endBlock)
+        self.Builders.append(ir.IRBuilder(endBlock))
+        self.SymbolTable.QuitScope()
+        return
+    
+    # 具体代码块：for
+    def visitFor_block(self, ctx:CgrammerParser.For_blockContext):
+        self.SymbolTable.EnterScope()
+
+        # 创建条件块，执�?�块和跳出块
+        curBuilder = self.Builders[-1]
+        varBlock = curBuilder.append_basic_block()
+        condBlock = curBuilder.append_basic_block()
+        doBlock = curBuilder.append_basic_block()
+        endBlock = curBuilder.append_basic_block()
+       
+        # 首先处理for_var
+        curBuilder.branch(varBlock)
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(varBlock)
+        self.Builders.append(ir.IRBuilder(varBlock))
+        self.visit(ctx.getChild(2))
+                
+        # 处理condBlock，跳�?条件
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(condBlock)
+        self.Builders.append(ir.IRBuilder(condBlock))
+
+        result = self.visit(ctx.getChild(4)) # condition block
+        self.Builders[-1].cbranch(result['name'], doBlock, endBlock)
+
+        # 处理doblock，�?�应code与iter两部�?
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(doBlock)
+        self.Builders.append(ir.IRBuilder(doBlock))
+        self.visit(ctx.getChild(7)) # code
+        self.visit(ctx.getChild(5)) # iter
+
+         # do后跳�?回条件判�?
+        if not self.Blocks[-1].is_terminated:
+            self.Builders[-1].branch(condBlock)
+
+        # 处理endBlock，�?�应后续操作
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(endBlock)
+        self.Builders.append(ir.IRBuilder(endBlock))
+        self.SymbolTable.QuitScope()
+        return
+    
+    # for子块：for_var
+    def visitFor_var(self, ctx:CgrammerParser.For_varContext):
+        Length = ctx.getChildCount()
+        if Length == 0:
+            return
+
+        self.visit(ctx.getChild(0))
+        return
+
+    # for子块：for_iter
+    def visitFor_iter(self, ctx:CgrammerParser.FloatContext):
+        Length = ctx.getChildCount()
+        if Length == 0:
+            return
+
+        self.visit(ctx.getChild(0))
+        return
+
+    # TODO：具体代码块：switch
+    def visitSwitch_block(self, ctx: CgrammerParser.Switch_blockContext):
+        return self.visitChildren(ctx)
+    
     # Visit a parse tree produced by CgrammerParser#pointer_flag.
     def visitPointer_flag(self, ctx: CgrammerParser.Pointer_flagContext):
         return self.visitChildren(ctx)
@@ -377,7 +608,7 @@ class Visitor(CgrammerVisitor):
             theBuilder = self.Builders[-1]
             zero = ir.Constant(int32, 0)
 
-            # 就一个变量
+            # 就一�?变量
             if ctx.getChildCount() == 4:
                 ParameterInfo = self.visit(ctx.getChild(2))
                 Argument = theBuilder.gep(ParameterInfo['name'], [zero, zero], inbounds=True)
@@ -500,7 +731,7 @@ class Visitor(CgrammerVisitor):
                 Result = {'type': TheFunction.function_type.return_type, 'name': ReturnVariableName}
                 return Result
             else:
-                raise SemanticError(ctx=ctx, msg="函数未定义！")
+                raise SemanticError(ctx=ctx, msg="函数�?定义�?")
 
     # Visit a parse tree produced by CgrammerParser#id.
     def visitId(self, ctx: CgrammerParser.IdContext):
@@ -864,7 +1095,7 @@ class Visitor(CgrammerVisitor):
         elif self.isInteger(Index2['type']) and Index1['type'] == float32:
             Index2 = self.convertIDS(Index2, Index1['type'])
         else:
-            raise SemanticError(ctx=ctx, msg="类型不匹�?")
+            raise SemanticError(ctx=ctx, msg="类型不匹�??")
         return Index1, Index2
 
     def convertIIZ(self, CalcIndex, DType):
@@ -959,7 +1190,7 @@ class Visitor(CgrammerVisitor):
     # Visit a parse tree produced by CgrammerParser#function_definition.
     def visitFunction_definition(self, ctx: CgrammerParser.Function_definitionContext):
         # function_definition: ( type | VOID ) IDENTIFIER LROUND params_definition? RROUND LCURLY code RCURLY;
-        # 获取返回值类型?
+        # 获取返回值类�??
         if ctx.start.type == CgrammerParser.VOID:
             return_type = void
         else:
@@ -985,37 +1216,37 @@ class Visitor(CgrammerVisitor):
         for i in range(len(parameter_list)):
             function.args[i].name = parameter_list[i]['name']
 
-        # 为函数添加基本块
+        # 为函数添加基�?�?
         block = function.append_basic_block(name=function_name + '_entry')
         self.Blocks.append(block)
 
-        # 为函数添加指令工具
+        # 为函数添加指令工�?
         builder = ir.IRBuilder(block)
         self.Builders.append(builder)
 
-        # 为处理函数体做准备
+        # 为�?�理函数体做准�??
         self.CurrentFunction = function_name
         self.SymbolTable.EnterScope()
 
-        # 为形参分配空间并在符号表里建立表项
+        # 为形参分配空间并在�?�号表里建立表项
         for i in range(len(parameter_list)):
-            # 创建一个alloca指令，用于在栈上分配内存，返回一个指向分配内存的指针
+            # 创建一个alloca指令，用于在栈上分配内存，返回一�?指向分配内存的指�?
             address = builder.alloca(parameter_list[i]['type'])
-            # 创建一个load指令，用于加载指针所指的值
+            # 创建一个load指令，用于加载指针所指的�?
             builder.store(function.args[i], address)
-            # 在符号表里建立表项
+            # 在�?�号表里建立表项
             item = {"type": parameter_list[i]['type'], "entry": address}
             result = self.SymbolTable.AddItem(parameter_list[i]['name'], item)
             if result["result"] != "success":
                 raise SemanticError(ctx=ctx, msg=result["reason"])
 
-        # 处理函数体
+        # 处理函数�?
         if ctx.getChildCount() < 8:
             self.visit(ctx.getChild(5))
         else:
             self.visit(ctx.getChild(6))
 
-        # 处理完毕，退一层
+        # 处理完毕，退一�?
         self.CurrentFunction = ''
         self.Blocks.pop()
         self.Builders.pop()
@@ -1027,9 +1258,9 @@ class Visitor(CgrammerVisitor):
 
 
 class Compiler:
-    # 遍历器
+    # 遍历�?
     visitor = Visitor()
-
+    
     def compile(self, input_filename, output_filename):
         lexer = CgrammerLexer(FileStream(input_filename))
         stream = CommonTokenStream(lexer)

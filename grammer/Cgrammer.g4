@@ -23,6 +23,7 @@ INT: 'int';
 FLOAT: 'float';
 CHAR: 'char';
 BOOL: 'bool';
+STRING: 'string';
 CONST: 'const';
 IF: 'if';
 ELSE: 'else';
@@ -89,8 +90,8 @@ COMMENT: '//' ~[\r\n]* '\r'? '\n' -> skip ;
 
 // ??��???��
 // �����������??
-announcer: INT # int | FLOAT # float | CHAR # char | BOOL # bool;
-pointer_flag: MULTIPLYorREFERENCEorPTR;
+announcer: INT # int | FLOAT # float | CHAR # char | BOOL # bool | STRING # string;
+pointer_flag: MULTIPLYorREFERENCEorPTR | MULTIPLYorREFERENCEorPTR pointer_flag;
 type: announcer # originalType | announcer pointer_flag # pointer;
 index: LSQUARE ( value | expression | function_call ) RSQUARE;
 lib_function: MEMSETFUNC # memset| STRLENFUC # strlen | PRINTFFUNC # printf| SCANFFUNC # scanf;

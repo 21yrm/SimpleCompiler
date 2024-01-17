@@ -29,6 +29,11 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by CgrammerParser#string.
+    def visitString(self, ctx:CgrammerParser.StringContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by CgrammerParser#pointer_flag.
     def visitPointer_flag(self, ctx:CgrammerParser.Pointer_flagContext):
         return self.visitChildren(ctx)
