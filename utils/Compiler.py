@@ -132,7 +132,142 @@ class Visitor(CgrammerVisitor):
 
     # Visit a parse tree produced by CgrammerParser#function_call.
     def visitFunction_call(self, ctx: CgrammerParser.Function_callContext):
-        return self.visitChildren(ctx)
+        function_name = ctx.getChild(0)
+        if function_name.getText() == 'printf':
+            if 'printf' in self.Functions:
+                printf = self.Functions['printf']
+            else:
+                printfType = ir.FunctionType(int32, [ir.PointerType(int8)], var_arg=True)
+                printf = ir.Function(self.Module, printfType, name="printf")
+                self.Functions['printf'] = printf
+
+            theBuilder = self.Builders[-1]
+            zero = ir.Constant(int32, 0)
+
+            # 就一个变量
+            if ctx.getChildCount() == 4:
+                ParameterInfo = self.visit(ctx.getChild(2))
+                Argument = theBuilder.gep(ParameterInfo['name'], [zero, zero], inbounds=True)
+                ReturnVariableName = theBuilder.call(printf, [Argument])
+            else:
+                ParameterInfo = self.visit(ctx.getChild(2))
+                Arguments = [theBuilder.gep(ParameterInfo['name'], [zero, zero], inbounds=True)]
+
+                Length = ctx.getChildCount()
+                i = 4
+                while i < Length - 1:
+                    OneParameter = self.visit(ctx.getChild(i))
+                    Arguments.append(OneParameter['name'])
+                    i += 2
+                ReturnVariableName = theBuilder.call(printf, Arguments)
+            result = {'type': int32, 'name': ReturnVariableName}
+            return result
+        elif function_name.getText() == 'scanf':
+            if 'scanf' in self.Functions:
+                scanf = self.Functions['scanf']
+            else:
+                scanfType = ir.FunctionType(int32, [ir.PointerType(int8)], var_arg=True)
+                scanf = ir.Function(self.Module, scanfType, name="scanf")
+                self.Functions['scanf'] = scanf
+
+            theBuilder = self.Builders[-1]
+            zero = ir.Constant(int32, 0)
+            ParameterList = self.visit(ctx.getChild(2))  # MString
+            Arguments = [theBuilder.gep(ParameterList['name'], [zero, zero], inbounds=True)]
+
+            Length = ctx.getChildCount()
+            i = 4
+            while i < Length - 1:
+                if ctx.getChild(i).getText() == '&':
+                    # 读取变量
+                    PreviousNeedLoad = self.WhetherNeedLoad
+                    self.WhetherNeedLoad = False
+                    theParameter = self.visit(ctx.getChild(i + 1))
+                    self.WhetherNeedLoad = PreviousNeedLoad
+                    Arguments.append(theParameter['name'])
+                    i += 3
+                else:
+                    PreviousNeedLoad = self.WhetherNeedLoad
+                    self.WhetherNeedLoad = True
+                    theParameter = self.visit(ctx.getChild(i))
+                    self.WhetherNeedLoad = PreviousNeedLoad
+                    Arguments.append(theParameter['name'])
+                    i += 2
+
+            ReturnVariableName = theBuilder.call(scanf, Arguments)
+            result = {'type': int32, 'name': ReturnVariableName}
+            return result
+        elif function_name.getText() == 'strlen':
+            if 'strlen' in self.Functions:
+                strlen = self.Functions['strlen']
+            else:
+                strlenType = ir.FunctionType(int32, [ir.PointerType(int8)], var_arg=False)
+                strlen = ir.Function(self.Module, strlenType, name="strlen")
+                self.Functions['strlen'] = strlen
+
+            theBuilder = self.Builders[-1]
+            zero = ir.Constant(int32, 0)
+
+            # 加载变量
+            PreviousNeedLoad = self.WhetherNeedLoad
+            self.WhetherNeedLoad = False
+            res = self.visit(ctx.getChild(2))
+            self.WhetherNeedLoad = PreviousNeedLoad
+
+            Arguments = theBuilder.gep(res['name'], [zero, zero], inbounds=True)
+            ReturnVariableName = theBuilder.call(strlen, [Arguments])
+
+            result = {'type': int32, 'name': ReturnVariableName}
+            return result
+        elif function_name.getText() == 'memset':
+            if 'memset' in self.Functions:
+                memset = self.Functions['memset']
+            else:
+                memsetType = ir.FunctionType(int32, [ir.PointerType(int8)], var_arg=False)
+                memset = ir.Function(self.Module, memsetType, name="memset")
+                self.Functions['strlen'] = memset
+
+            theBuilder = self.Builders[-1]
+
+            # 加载变量
+            PreviousNeedLoad = self.WhetherNeedLoad
+            self.WhetherNeedLoad = False
+            res = self.visit(ctx.getChild(2))
+            self.WhetherNeedLoad = PreviousNeedLoad
+            zero = ir.Constant(int32, 0)
+
+            Arguments = theBuilder.gep(res['name'], [zero, zero], inbounds=True)
+            i = 2
+            while i <= 6:
+                PreviousNeedLoad = self.WhetherNeedLoad
+                self.WhetherNeedLoad = True
+                theParameter = self.visit(ctx.getChild(i))
+                self.WhetherNeedLoad = PreviousNeedLoad
+                Arguments.append(theParameter['name'])
+                i += 2
+            ReturnVariableName = theBuilder.call(theBuilder, [Arguments])
+
+            Result = {'type': int32, 'name': ReturnVariableName}
+            return Result
+        else:
+            theBuilder = self.Builders[-1]
+            FunctionName = ctx.getChild(0).getText()  # func name
+            if FunctionName in self.Functions:
+                TheFunction = self.Functions[FunctionName]
+
+                Length = ctx.getChildCount()
+                ParameterList = []
+                i = 2
+                while i < Length - 1:
+                    TheParameter = self.visit(ctx.getChild(i))
+                    TheParameter = self.assignConvert(TheParameter, TheFunction.args[i // 2 - 1].type)
+                    ParameterList.append(TheParameter['name'])
+                    i += 2
+                ReturnVariableName = theBuilder.call(TheFunction, ParameterList)
+                Result = {'type': TheFunction.function_type.return_type, 'name': ReturnVariableName}
+                return Result
+            else:
+                raise SemanticError(ctx=ctx, msg="函数未定义！")
 
     # Visit a parse tree produced by CgrammerParser#id.
     def visitId(self, ctx: CgrammerParser.IdContext):
@@ -568,19 +703,19 @@ class Visitor(CgrammerVisitor):
 
     # Visit a parse tree produced by CgrammerParser#memest_announce.
     def visitMemest_announce(self, ctx: CgrammerParser.Memest_announceContext):
-        return self.visitChildren(ctx)
+        return
 
     # Visit a parse tree produced by CgrammerParser#strlen_announce.
     def visitStrlen_announce(self, ctx: CgrammerParser.Strlen_announceContext):
-        return self.visitChildren(ctx)
+        return
 
     # Visit a parse tree produced by CgrammerParser#printf_announce.
     def visitPrintf_announce(self, ctx: CgrammerParser.Printf_announceContext):
-        return self.visitChildren(ctx)
+        return
 
     # Visit a parse tree produced by CgrammerParser#scanf_annouce.
     def visitScanf_annouce(self, ctx: CgrammerParser.Scanf_annouceContext):
-        return self.visitChildren(ctx)
+        return
 
     # Visit a parse tree produced by CgrammerParser#function_definition.
     def visitFunction_definition(self, ctx: CgrammerParser.Function_definitionContext):
