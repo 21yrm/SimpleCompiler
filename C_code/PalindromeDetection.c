@@ -15,8 +15,8 @@ int main() {
             break;
         }
     if (flag)
-        printf("input string is plalindrome\n");
+        printf("input string is palindrome\n");
     else 
-        printf("input string is not plalindrome\n");
+        printf("input string is not palindrome\n");
     return 0;
 }

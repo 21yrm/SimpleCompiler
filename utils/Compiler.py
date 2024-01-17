@@ -8,7 +8,7 @@ from SymbolTable import SymbolTable, Structure
 # from Generator.ErrorListener import syntaxErrorListener
 # from Generator.ErrorListener import SemanticError
 
-double = ir.DoubleType()
+float32 = ir.FloatType(32)
 int1 = ir.IntType(1)
 int32 = ir.IntType(32)
 int8 = ir.IntType(8)
@@ -371,26 +371,26 @@ class Visitor(CgrammerVisitor):
                 printf = ir.Function(self.Module, printfType, name="printf")
                 self.Functions['printf'] = printf
 
-            theBuilder = self.Builders[-1]
+            builder = self.Builders[-1]
             zero = ir.Constant(int32, 0)
 
             # 就一个变量
             if ctx.getChildCount() == 4:
-                ParameterInfo = self.visit(ctx.getChild(2))
-                Argument = theBuilder.gep(ParameterInfo['name'], [zero, zero], inbounds=True)
-                ReturnVariableName = theBuilder.call(printf, [Argument])
+                parameterInfo = self.visit(ctx.getChild(2))
+                argument = builder.gep(parameterInfo['name'], [zero, zero], inbounds=True)
+                returnVariableName = builder.call(printf, [argument])
             else:
-                ParameterInfo = self.visit(ctx.getChild(2))
-                Arguments = [theBuilder.gep(ParameterInfo['name'], [zero, zero], inbounds=True)]
+                parameterInfo = self.visit(ctx.getChild(2))
+                arguments = [builder.gep(parameterInfo['name'], [zero, zero], inbounds=True)]
 
                 Length = ctx.getChildCount()
                 i = 4
                 while i < Length - 1:
-                    OneParameter = self.visit(ctx.getChild(i))
-                    Arguments.append(OneParameter['name'])
+                    parameter = self.visit(ctx.getChild(i))
+                    arguments.append(parameter['name'])
                     i += 2
-                ReturnVariableName = theBuilder.call(printf, Arguments)
-            result = {'type': int32, 'name': ReturnVariableName}
+                returnVariableName = builder.call(printf, arguments)
+            result = {'type': int32, 'name': returnVariableName}
             return result
         elif function_name.getText() == 'scanf':
             if 'scanf' in self.Functions:
@@ -400,32 +400,32 @@ class Visitor(CgrammerVisitor):
                 scanf = ir.Function(self.Module, scanfType, name="scanf")
                 self.Functions['scanf'] = scanf
 
-            theBuilder = self.Builders[-1]
+            builder = self.Builders[-1]
             zero = ir.Constant(int32, 0)
-            ParameterList = self.visit(ctx.getChild(2))  # MString
-            Arguments = [theBuilder.gep(ParameterList['name'], [zero, zero], inbounds=True)]
+            parameterList = self.visit(ctx.getChild(2))  # MString
+            arguments = [builder.gep(parameterList['name'], [zero, zero], inbounds=True)]
 
-            Length = ctx.getChildCount()
+            length = ctx.getChildCount()
             i = 4
-            while i < Length - 1:
+            while i < length - 1:
                 if ctx.getChild(i).getText() == '&':
                     # 读取变量
-                    PreviousNeedLoad = self.WhetherNeedLoad
+                    previousNeedLoad = self.WhetherNeedLoad
                     self.WhetherNeedLoad = False
-                    theParameter = self.visit(ctx.getChild(i + 1))
-                    self.WhetherNeedLoad = PreviousNeedLoad
-                    Arguments.append(theParameter['name'])
+                    parameter = self.visit(ctx.getChild(i + 1))
+                    self.WhetherNeedLoad = previousNeedLoad
+                    arguments.append(parameter['name'])
                     i += 3
                 else:
-                    PreviousNeedLoad = self.WhetherNeedLoad
+                    previousNeedLoad = self.WhetherNeedLoad
                     self.WhetherNeedLoad = True
-                    theParameter = self.visit(ctx.getChild(i))
-                    self.WhetherNeedLoad = PreviousNeedLoad
-                    Arguments.append(theParameter['name'])
+                    parameter = self.visit(ctx.getChild(i))
+                    self.WhetherNeedLoad = previousNeedLoad
+                    arguments.append(parameter['name'])
                     i += 2
 
-            ReturnVariableName = theBuilder.call(scanf, Arguments)
-            result = {'type': int32, 'name': ReturnVariableName}
+            returnVariableName = builder.call(scanf, arguments)
+            result = {'type': int32, 'name': returnVariableName}
             return result
         elif function_name.getText() == 'strlen':
             if 'strlen' in self.Functions:
@@ -435,19 +435,19 @@ class Visitor(CgrammerVisitor):
                 strlen = ir.Function(self.Module, strlenType, name="strlen")
                 self.Functions['strlen'] = strlen
 
-            theBuilder = self.Builders[-1]
+            builder = self.Builders[-1]
             zero = ir.Constant(int32, 0)
 
             # 加载变量
-            PreviousNeedLoad = self.WhetherNeedLoad
+            previousNeedLoad = self.WhetherNeedLoad
             self.WhetherNeedLoad = False
             res = self.visit(ctx.getChild(2))
-            self.WhetherNeedLoad = PreviousNeedLoad
+            self.WhetherNeedLoad = previousNeedLoad
 
-            Arguments = theBuilder.gep(res['name'], [zero, zero], inbounds=True)
-            ReturnVariableName = theBuilder.call(strlen, [Arguments])
+            arguments = builder.gep(res['name'], [zero, zero], inbounds=True)
+            returnVariableName = builder.call(strlen, [arguments])
 
-            result = {'type': int32, 'name': ReturnVariableName}
+            result = {'type': int32, 'name': returnVariableName}
             return result
         elif function_name.getText() == 'memset':
             if 'memset' in self.Functions:
@@ -457,45 +457,45 @@ class Visitor(CgrammerVisitor):
                 memset = ir.Function(self.Module, memsetType, name="memset")
                 self.Functions['strlen'] = memset
 
-            theBuilder = self.Builders[-1]
+            builder = self.Builders[-1]
 
             # 加载变量
-            PreviousNeedLoad = self.WhetherNeedLoad
+            previousNeedLoad = self.WhetherNeedLoad
             self.WhetherNeedLoad = False
             res = self.visit(ctx.getChild(2))
-            self.WhetherNeedLoad = PreviousNeedLoad
+            self.WhetherNeedLoad = previousNeedLoad
             zero = ir.Constant(int32, 0)
 
-            Arguments = theBuilder.gep(res['name'], [zero, zero], inbounds=True)
+            arguments = builder.gep(res['name'], [zero, zero], inbounds=True)
             i = 2
             while i <= 6:
-                PreviousNeedLoad = self.WhetherNeedLoad
+                previousNeedLoad = self.WhetherNeedLoad
                 self.WhetherNeedLoad = True
-                theParameter = self.visit(ctx.getChild(i))
-                self.WhetherNeedLoad = PreviousNeedLoad
-                Arguments.append(theParameter['name'])
+                parameter = self.visit(ctx.getChild(i))
+                self.WhetherNeedLoad = previousNeedLoad
+                arguments.append(parameter['name'])
                 i += 2
-            ReturnVariableName = theBuilder.call(theBuilder, [Arguments])
+            returnVariableName = builder.call(memset, [arguments])
 
-            Result = {'type': int32, 'name': ReturnVariableName}
-            return Result
+            result = {'type': int32, 'name': returnVariableName}
+            return result
         else:
-            theBuilder = self.Builders[-1]
-            FunctionName = ctx.getChild(0).getText()  # func name
-            if FunctionName in self.Functions:
-                TheFunction = self.Functions[FunctionName]
+            builder = self.Builders[-1]
+            functionName = ctx.getChild(0).getText()  # func name
+            if functionName in self.Functions:
+                function = self.Functions[functionName]
 
-                Length = ctx.getChildCount()
-                ParameterList = []
+                length = ctx.getChildCount()
+                parameterList = []
                 i = 2
-                while i < Length - 1:
-                    TheParameter = self.visit(ctx.getChild(i))
-                    TheParameter = self.assignConvert(TheParameter, TheFunction.args[i // 2 - 1].type)
-                    ParameterList.append(TheParameter['name'])
+                while i < length - 1:
+                    parameter = self.visit(ctx.getChild(i))
+                    parameter = self.assignConvert(parameter, function.args[i // 2 - 1].type)
+                    parameterList.append(parameter['name'])
                     i += 2
-                ReturnVariableName = theBuilder.call(TheFunction, ParameterList)
-                Result = {'type': TheFunction.function_type.return_type, 'name': ReturnVariableName}
-                return Result
+                returnVariableName = builder.call(function, parameterList)
+                result = {'type': function.function_type.return_type, 'name': returnVariableName}
+                return result
             else:
                 raise SemanticError(ctx=ctx, msg="函数未定义！")
 
@@ -542,46 +542,46 @@ class Visitor(CgrammerVisitor):
 
     # Visit a parse tree produced by CgrammerParser#content_of.
     def visitContent_of(self, ctx: CgrammerParser.Content_ofContext):
-        Index = self.visit(ctx.getChild(1))
-        Builder = self.Builders[-1]
-        RealReturnValue = Builder.load(Index['name'])
+        index = self.visit(ctx.getChild(1))
+        builder = self.Builders[-1]
+        returnValue = builder.load(index['name'])
         return {
-            'type': Index['type'].pointee,
-            'name': RealReturnValue
+            'type': index['type'].pointee,
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#address_of.
     def visitAddress_of(self, ctx: CgrammerParser.Address_ofContext):
-        Index = self.visit(ctx.getChild(1))
-        Builder = self.Builders[-1]
-        RealReturnValue = Builder.gep(Index['name'], [ir.Constant(ir.IntType(32), 0)])
+        index = self.visit(ctx.getChild(1))
+        builder = self.Builders[-1]
+        returnValue = builder.gep(index['name'], [ir.Constant(ir.IntType(32), 0)])
         return {
-            'type': ir.PointerType(Index['type']),
-            'name': RealReturnValue
+            'type': ir.PointerType(index['type']),
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#array.
     def visitArray(self, ctx: CgrammerParser.ArrayContext):
-        TempRequireLoad = self.WhetherNeedLoad
+        tempRequireLoad = self.WhetherNeedLoad
         self.WhetherNeedLoad = False
         res = self.visit(ctx.getChild(0))  # mID
-        self.WhetherNeedLoad = TempRequireLoad
+        self.WhetherNeedLoad = tempRequireLoad
 
         if isinstance(res['type'], ir.types.ArrayType):
-            Builder = self.Builders[-1]
+            builder = self.Builders[-1]
 
-            TempRequireLoad = self.WhetherNeedLoad
+            tempRequireLoad = self.WhetherNeedLoad
             self.WhetherNeedLoad = True
-            IndexRe1 = self.visit(ctx.getChild(2))  # subscript
-            self.WhetherNeedLoad = TempRequireLoad
+            indexRe1 = self.visit(ctx.getChild(2))  # subscript
+            self.WhetherNeedLoad = tempRequireLoad
 
-            Int32Zero = ir.Constant(int32, 0)
-            RealReturnValue = Builder.gep(res['name'], [Int32Zero, IndexRe1['name']], inbounds=True)
+            int32Zero = ir.Constant(int32, 0)
+            returnValue = builder.gep(res['name'], [int32Zero, indexRe1['name']], inbounds=True)
             if self.WhetherNeedLoad:
-                RealReturnValue = Builder.load(RealReturnValue)
+                returnValue = builder.load(returnValue)
             return {
                 'type': res['type'].element,
-                'name': RealReturnValue,
+                'name': returnValue,
             }
         else:  # error!
             raise SemanticError(ctx=ctx, msg="类型错�??")
@@ -592,56 +592,56 @@ class Visitor(CgrammerVisitor):
 
     # Visit a parse tree produced by CgrammerParser#lincrese.
     def visitLincrese(self, ctx: CgrammerParser.LincreseContext):
-        Index = self.visit(ctx.getChild(1))
-        Builder = self.Builders[-1]
-        OriginalValue = Builder.load(Index['name'])
-        RealReturnValue = Builder.add(OriginalValue, ir.Constant(ir.IntType(32), 1))
-        Builder.store(RealReturnValue, Index['name'])
+        index = self.visit(ctx.getChild(1))
+        builder = self.Builders[-1]
+        originalValue = builder.load(index['name'])
+        returnValue = builder.add(originalValue, ir.Constant(ir.IntType(32), 1))
+        builder.store(returnValue, index['name'])
         return {
-            'type': Index['type'],
-            'name': RealReturnValue
+            'type': index['type'],
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#rincrease.
     def visitRincrease(self, ctx: CgrammerParser.RincreaseContext):
-        Index = self.visit(ctx.getChild(0))
-        Builder = self.Builders[-1]
-        OriginalValue = Builder.load(Index['name'])
-        RealReturnValue = Builder.add(OriginalValue, ir.Constant(ir.IntType(32), 1))
-        Builder.store(RealReturnValue, Index['name'])
+        index = self.visit(ctx.getChild(0))
+        builder = self.Builders[-1]
+        originalValue = builder.load(index['name'])
+        returnValue = builder.add(originalValue, ir.Constant(ir.IntType(32), 1))
+        builder.store(returnValue, index['name'])
         return {
-            'type': Index['type'],
-            'name': OriginalValue
+            'type': index['type'],
+            'name': originalValue
         }
 
     # Visit a parse tree produced by CgrammerParser#ldecrease.
     def visitLdecrease(self, ctx: CgrammerParser.LdecreaseContext):
-        Index = self.visit(ctx.getChild(1))
-        Builder = self.Builders[-1]
-        OriginalValue = Builder.load(Index['name'])
-        RealReturnValue = Builder.sub(OriginalValue, ir.Constant(ir.IntType(32), 1))
-        Builder.store(RealReturnValue, Index['name'])
+        index = self.visit(ctx.getChild(1))
+        builder = self.Builders[-1]
+        originalValue = builder.load(index['name'])
+        returnValue = builder.sub(originalValue, ir.Constant(ir.IntType(32), 1))
+        builder.store(returnValue, index['name'])
         return {
-            'type': Index['type'],
-            'name': RealReturnValue
+            'type': index['type'],
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#rdecrease.
     def visitRdecrease(self, ctx: CgrammerParser.RdecreaseContext):
-        Index = self.visit(ctx.getChild(0))
-        Builder = self.Builders[-1]
-        OriginalValue = Builder.load(Index['name'])
-        RealReturnValue = Builder.sub(OriginalValue, ir.Constant(ir.IntType(32), 1))
-        Builder.store(RealReturnValue, Index['name'])
+        index = self.visit(ctx.getChild(0))
+        builder = self.Builders[-1]
+        originalValue = builder.load(index['name'])
+        returnValue = builder.sub(originalValue, ir.Constant(ir.IntType(32), 1))
+        builder.store(returnValue, index['name'])
         return {
-            'type': Index['type'],
-            'name': OriginalValue
+            'type': index['type'],
+            'name': originalValue
         }
 
     # Visit a parse tree produced by CgrammerParser#not.
     def visitNot(self, ctx: CgrammerParser.NotContext):
-        RealReturnValue = self.visit(ctx.getChild(1))
-        return self.toBoolean(RealReturnValue, notFlag=True)
+        returnValue = self.visit(ctx.getChild(1))
+        return self.toBoolean(returnValue, notFlag=True)
 
     # Visit a parse tree produced by CgrammerParser#positive.
     def visitPositive(self, ctx: CgrammerParser.PositiveContext):
@@ -649,12 +649,12 @@ class Visitor(CgrammerVisitor):
 
     # Visit a parse tree produced by CgrammerParser#negative.
     def visitNegative(self, ctx: CgrammerParser.NegativeContext):
-        IndexMid = self.visit(ctx.getChild(1))
-        Builder = self.Builders[-1]
-        RealReturnValue = Builder.neg(IndexMid['name'])
+        index = self.visit(ctx.getChild(1))
+        builder = self.Builders[-1]
+        returnValue = builder.neg(index['name'])
         return {
-            'type': IndexMid['type'],
-            'name': RealReturnValue
+            'type': index['type'],
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#addr.
@@ -663,14 +663,14 @@ class Visitor(CgrammerVisitor):
 
     # Visit a parse tree produced by CgrammerParser#divide.
     def visitDivide(self, ctx: CgrammerParser.DivideContext):
-        Builder = self.Builders[-1]
-        Index1 = self.visit(ctx.getChild(0))
-        Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
-        RealReturnValue = Builder.sdiv(Index1['name'], Index2['name'])
+        builder = self.Builders[-1]
+        index1 = self.visit(ctx.getChild(0))
+        index2 = self.visit(ctx.getChild(2))
+        index1, index2 = self.exprConvert(ctx, index1, index2)
+        returnValue = builder.sdiv(index1['name'], index2['name'])
         return {
-            'type': Index1['type'],
-            'name': RealReturnValue
+            'type': index1['type'],
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#unary.
@@ -679,50 +679,50 @@ class Visitor(CgrammerVisitor):
 
     # Visit a parse tree produced by CgrammerParser#multiply.
     def visitMultiply(self, ctx: CgrammerParser.MultiplyContext):
-        Builder = self.Builders[-1]
-        Index1 = self.visit(ctx.getChild(0))
-        Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
-        RealReturnValue = Builder.mul(Index1['name'], Index2['name'])
+        builder = self.Builders[-1]
+        index1 = self.visit(ctx.getChild(0))
+        index2 = self.visit(ctx.getChild(2))
+        index1, index2 = self.exprConvert(ctx, index1, index2)
+        returnValue = builder.mul(index1['name'], index2['name'])
         return {
-            'type': Index1['type'],
-            'name': RealReturnValue
+            'type': index1['type'],
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#modulo.
     def visitModulo(self, ctx: CgrammerParser.ModuloContext):
-        Builder = self.Builders[-1]
-        Index1 = self.visit(ctx.getChild(0))
-        Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
-        RealReturnValue = Builder.srem(Index1['name'], Index2['name'])
+        builder = self.Builders[-1]
+        index1 = self.visit(ctx.getChild(0))
+        index2 = self.visit(ctx.getChild(2))
+        index1, index2 = self.exprConvert(ctx, index1, index2)
+        returnValue = builder.srem(index1['name'], index2['name'])
         return {
-            'type': Index1['type'],
-            'name': RealReturnValue
+            'type': index1['type'],
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#add.
     def visitAdd(self, ctx: CgrammerParser.AddContext):
-        Builder = self.Builders[-1]
-        Index1 = self.visit(ctx.getChild(0))
-        Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
-        RealReturnValue = Builder.add(Index1['name'], Index2['name'])
+        builder = self.Builders[-1]
+        index1 = self.visit(ctx.getChild(0))
+        index2 = self.visit(ctx.getChild(2))
+        index1, index2 = self.exprConvert(ctx, index1, index2)
+        returnValue = builder.add(index1['name'], index2['name'])
         return {
-            'type': Index1['type'],
-            'name': RealReturnValue
+            'type': index1['type'],
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#subtract.
     def visitSubtract(self, ctx: CgrammerParser.SubtractContext):
-        Builder = self.Builders[-1]
-        Index1 = self.visit(ctx.getChild(0))
-        Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
-        RealReturnValue = Builder.sub(Index1['name'], Index2['name'])
+        builder = self.Builders[-1]
+        index1 = self.visit(ctx.getChild(0))
+        index2 = self.visit(ctx.getChild(2))
+        index1, index2 = self.exprConvert(ctx, index1, index2)
+        returnValue = builder.sub(index1['name'], index2['name'])
         return {
-            'type': Index1['type'],
-            'name': RealReturnValue
+            'type': index1['type'],
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#calc1.
@@ -730,18 +730,18 @@ class Visitor(CgrammerVisitor):
         return self.visitChildren(ctx)
 
     def visitJudge(self, ctx):
-        Builder = self.Builders[-1]
-        Index1 = self.visit(ctx.getChild(0))
-        Index2 = self.visit(ctx.getChild(2))
-        Index1, Index2 = self.exprConvert(ctx, Index1, Index2)
-        OperationChar = ctx.getChild(1).getText()
-        if Index1['type'] == float32:
-            RealReturnValue = Builder.fcmp_ordered(OperationChar, Index1['name'], Index2['name'])
-        elif self.isInteger(Index1['type']):
-            RealReturnValue = Builder.icmp_signed(OperationChar, Index1['name'], Index2['name'])
+        builder = self.Builders[-1]
+        index1 = self.visit(ctx.getChild(0))
+        index2 = self.visit(ctx.getChild(2))
+        index1, index2 = self.exprConvert(ctx, index1, index2)
+        operationChar = ctx.getChild(1).getText()
+        if index1['type'] == float32:
+            returnValue = builder.fcmp_ordered(operationChar, index1['name'], index2['name'])
+        elif self.isInteger(index1['type']):
+            returnValue = builder.icmp_signed(operationChar, index1['name'], index2['name'])
         return {
             'type': int1,
-            'name': RealReturnValue
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#equal.
@@ -783,10 +783,10 @@ class Visitor(CgrammerVisitor):
         Index2 = self.visit(ctx.getChild(2))
         Index2 = self.toBoolean(Index2, notFlag=False)
         Builder = self.Builders[-1]
-        RealReturnValue = Builder.or_(Index1['name'], Index2['name'])
+        returnValue = Builder.or_(Index1['name'], Index2['name'])
         return {
             'type': Index1['type'],
-            'name': RealReturnValue
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#and.
@@ -796,10 +796,10 @@ class Visitor(CgrammerVisitor):
         Index2 = self.visit(ctx.getChild(2))
         Index2 = self.toBoolean(Index2, notFlag=False)
         Builder = self.Builders[-1]
-        RealReturnValue = Builder.and_(Index1['name'], Index2['name'])
+        returnValue = Builder.and_(Index1['name'], Index2['name'])
         return {
             'type': Index1['type'],
-            'name': RealReturnValue
+            'name': returnValue
         }
 
     # Visit a parse tree produced by CgrammerParser#rop2.
@@ -919,17 +919,17 @@ class Visitor(CgrammerVisitor):
         else:
             OperationChar = '!='
         if ManipulateIndex['type'] == int8 or ManipulateIndex['type'] == int32:
-            RealReturnValue = Builder.icmp_signed(OperationChar, ManipulateIndex['name'],
+            returnValue = Builder.icmp_signed(OperationChar, ManipulateIndex['name'],
                                                   ir.Constant(ManipulateIndex['type'], 0))
             return {
                 'tpye': int1,
-                'name': RealReturnValue
+                'name': returnValue
             }
         elif ManipulateIndex['type'] == float32:
-            RealReturnValue = Builder.fcmp_ordered(OperationChar, ManipulateIndex['name'], ir.Constant(float32, 0))
+            returnValue = Builder.fcmp_ordered(OperationChar, ManipulateIndex['name'], ir.Constant(float32, 0))
             return {
                 'tpye': int1,
-                'name': RealReturnValue
+                'name': returnValue
             }
         return ManipulateIndex
 
