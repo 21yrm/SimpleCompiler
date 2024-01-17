@@ -29,6 +29,11 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by CgrammerParser#string.
+    def visitString(self, ctx:CgrammerParser.StringContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by CgrammerParser#pointer_flag.
     def visitPointer_flag(self, ctx:CgrammerParser.Pointer_flagContext):
         return self.visitChildren(ctx)
@@ -354,8 +359,28 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by CgrammerParser#condition.
+    def visitCondition(self, ctx:CgrammerParser.ConditionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by CgrammerParser#if_block.
     def visitIf_block(self, ctx:CgrammerParser.If_blockContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#pure_if_block.
+    def visitPure_if_block(self, ctx:CgrammerParser.Pure_if_blockContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#elif_block.
+    def visitElif_block(self, ctx:CgrammerParser.Elif_blockContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#else_block.
+    def visitElse_block(self, ctx:CgrammerParser.Else_blockContext):
         return self.visitChildren(ctx)
 
 
@@ -366,6 +391,16 @@ class CgrammerVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by CgrammerParser#for_block.
     def visitFor_block(self, ctx:CgrammerParser.For_blockContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#for_var.
+    def visitFor_var(self, ctx:CgrammerParser.For_varContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#for_iter.
+    def visitFor_iter(self, ctx:CgrammerParser.For_iterContext):
         return self.visitChildren(ctx)
 
 
@@ -419,33 +454,8 @@ class CgrammerVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CgrammerParser#if.
-    def visitIf(self, ctx:CgrammerParser.IfContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#while.
-    def visitWhile(self, ctx:CgrammerParser.WhileContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#for.
-    def visitFor(self, ctx:CgrammerParser.ForContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#switch.
-    def visitSwitch(self, ctx:CgrammerParser.SwitchContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#single.
-    def visitSingle(self, ctx:CgrammerParser.SingleContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CgrammerParser#function.
-    def visitFunction(self, ctx:CgrammerParser.FunctionContext):
+    # Visit a parse tree produced by CgrammerParser#block.
+    def visitBlock(self, ctx:CgrammerParser.BlockContext):
         return self.visitChildren(ctx)
 
 
@@ -461,6 +471,11 @@ class CgrammerVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by CgrammerParser#code.
     def visitCode(self, ctx:CgrammerParser.CodeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CgrammerParser#program.
+    def visitProgram(self, ctx:CgrammerParser.ProgramContext):
         return self.visitChildren(ctx)
 
 

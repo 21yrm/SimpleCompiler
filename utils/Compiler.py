@@ -4,19 +4,15 @@ from grammer.CgrammerLexer import CgrammerLexer
 from grammer.CgrammerParser import CgrammerParser
 from grammer.CgrammerVisitor import CgrammerVisitor
 from SymbolTable import SymbolTable, Structure
-from ErrorListener import SyntaxErrorListener
-from ErrorListener import SemanticError
 
-float32 = ir.FloatType()
+# from Generator.ErrorListener import syntaxErrorListener
+# from Generator.ErrorListener import SemanticError
+
+double = ir.DoubleType()
 int1 = ir.IntType(1)
 int32 = ir.IntType(32)
 int8 = ir.IntType(8)
 void = ir.VoidType()
-float32_pointer = float32.as_pointer()
-int1_pointer = int1.as_pointer()
-int32_pointer = int32.as_pointer()
-int8_pointer = int8.as_pointer()
-
 
 class Visitor(CgrammerVisitor):
     """
@@ -53,8 +49,242 @@ class Visitor(CgrammerVisitor):
         # 符号�?
         self.SymbolTable = SymbolTable()
 
-        # Visit a parse tree produced by CgrammerParser#int.
 
+    # 入口符号 Program
+    def visitProgram(self, ctx:CgrammerParser.CodeContext):
+        for i in range(ctx.getChildCount()):
+            self.visit(ctx.getChild(i))
+        return
+    
+    # 代码入口 code
+    def visitCode(self, ctx:CgrammerParser.CodeContext):
+        for i in range(ctx.getChildCount()):
+            self.visit(ctx.getChild(i))
+        return
+
+    def visitDomained_code(self, ctx:CgrammerParser.Domained_codeContext):
+        self.visit(ctx.getChild(1))
+        return
+
+    def visitSimple_code(self, ctx: CgrammerParser.Simple_codeContext):
+        self.visit(ctx.getChild(0))
+        return
+
+    # 代码块 Block，可能为if、while、for、switch、function和line
+    def visitBlock(self, ctx:CgrammerParser.BlockContext):
+        self.visit(ctx.getChild(0))
+        return None
+
+    # TODO:条件语句
+    def visitCondition(self, ctx:CgrammerParser.ConditionContext):
+        result = self.visit(ctx.getChild(0))
+        return self.toBoolean(result, notFlag=False)
+
+    # 具体代码块：if
+    def visitIf_block(self, ctx:CgrammerParser.If_blockContext):
+        # 增加两个block，对应If的内容 和 If结束后的内容
+        curBuilder = self.Builders[-1] 
+        IfBlock = curBuilder.append_basic_block()
+        EndifBlock = curBuilder.append_basic_block()
+        curBuilder.branch(IfBlock)
+
+        # 纳入if
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(IfBlock)
+        self.Builders.append(ir.IRBuilder(IfBlock))
+
+        tmpBlock = self.EndifBlock
+        self.EndifBlock = EndifBlock
+        Length = ctx.getChildCount()
+        for i in range(Length):
+            self.visit(ctx.getChild(i))  # 分别处理每个if ,elseif, else块
+        self.EndifBlock = tmpBlock
+
+        # 结束后导向EndIf块
+        tmpBlock = self.Blocks.pop()
+        tmpBuilder = self.Builders.pop()
+        if not tmpBlock.is_terminated:
+            tmpBuilder.branch(EndifBlock)
+
+        self.Blocks.append(EndifBlock)
+        self.Builders.append(ir.IRBuilder(EndifBlock))
+        return
+
+    # if子块：首个if
+    def visitPure_if_block(self, ctx:CgrammerParser.Pure_if_blockContext):
+        # 创建真块与假块
+        self.SymbolTable.EnterScope()
+        curBuilder = self.Builders[-1]
+        TrueBlock = curBuilder.append_basic_block()
+        FalseBlock = curBuilder.append_basic_block()
+
+        # 由condition选择跳转
+        result = self.visit(ctx.getChild(2))
+        curBuilder.cbranch(result['name'], TrueBlock, FalseBlock)
+
+        # 处理TrueBlock，对应code
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(TrueBlock)
+        self.Builders.append(ir.IRBuilder(TrueBlock))
+        self.visit(ctx.getChild(4))
+
+        if not self.Blocks[-1].is_terminated:
+            self.Builders[-1].branch(self.EndifBlock)
+
+        # 处理FlaseBlock，对应后续操作
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(FalseBlock)
+        self.Builders.append(ir.IRBuilder(FalseBlock))
+        self.SymbolTable.QuitScope()
+        return
+
+    # if子块：elif
+    def visitElif_block(self, ctx:CgrammerParser.IntContext):
+        # 创建真块与假块
+        self.SymbolTable.EnterScope()
+        curBuilder = self.Builders[-1]
+        TrueBlock = curBuilder.append_basic_block()
+        FalseBlock = curBuilder.append_basic_block()
+
+        # 由condition选择跳转
+        result = self.visit(ctx.getChild(2))
+        curBuilder.cbranch(result['name'], TrueBlock, FalseBlock)
+        
+        # 处理TrueBlock，对应code
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(TrueBlock)
+        self.Builders.append(ir.IRBuilder(TrueBlock))
+        self.visit(ctx.getChild(4))
+
+        if not self.Blocks[-1].is_terminated:
+            self.Builders[-1].branch(self.EndifBlock)
+        
+        # 处理FlaseBlock，对应后续操作
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(FalseBlock)
+        self.Builders.append(ir.IRBuilder(FalseBlock))
+        self.SymbolTable.QuitScope()
+        return
+
+    # if子块：else
+    def visitElse_block(self, ctx:CgrammerParser.Else_blockContext):
+        # 直接生成
+        self.SymbolTable.EnterScope()
+        self.visit(ctx.getChild(2)) # body
+        self.SymbolTable.QuitScope()
+
+    # 具体代码块：while
+    def visitWhile_block(self, ctx:CgrammerParser.While_blockContext):
+        # 创建条件块，执行块与跳出块
+        self.SymbolTable.EnterScope()
+        curBuilder = self.Builders[-1]
+        condBlock = curBuilder.append_basic_block()
+        doBlock = curBuilder.append_basic_block()
+        endBlock = curBuilder.append_basic_block()
+
+        # 处理condBlock，对应expression
+        curBuilder.branch(condBlock)
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(condBlock)
+        self.Builders.append(ir.IRBuildercondBlock)
+        result = self.visit(ctx.getChild(2))
+        self.Builders[-1].cbranch(result['name'], doBlock, endBlock)
+
+        # 处理doBlock，对应code
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(doBlock)
+        self.Builders.append(ir.IRBuilder(doBlock))
+        self.visit(ctx.getChild(4)) # body
+
+        # do后跳转回条件判断
+        if not self.Blocks[-1].is_terminated:
+            self.Builders[-1].branch(condBlock)
+
+        # 处理endBlock，对应后续操作
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(endBlock)
+        self.Builders.append(ir.IRBuilder(endBlock))
+        self.SymbolTable.QuitScope()
+        return
+    
+    # 具体代码块：for
+    def visitFor_block(self, ctx:CgrammerParser.For_blockContext):
+        self.SymbolTable.EnterScope()
+
+        # 创建条件块，执行块和跳出块
+        curBuilder = self.Builders[-1]
+        varBlock = curBuilder.append_basic_block()
+        condBlock = curBuilder.append_basic_block()
+        doBlock = curBuilder.append_basic_block()
+        endBlock = curBuilder.append_basic_block()
+       
+        # 首先处理for_var
+        curBuilder.branch(varBlock)
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(varBlock)
+        self.Builders.append(ir.IRBuilder(varBlock))
+        self.visit(ctx.getChild(2))
+                
+        # 处理condBlock，跳转条件
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(condBlock)
+        self.Builders.append(ir.IRBuilder(condBlock))
+
+        result = self.visit(ctx.getChild(4)) # condition block
+        self.Builders[-1].cbranch(result['name'], doBlock, endBlock)
+
+        # 处理doblock，对应code与iter两部分
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(doBlock)
+        self.Builders.append(ir.IRBuilder(doBlock))
+        self.visit(ctx.getChild(7)) # code
+        self.visit(ctx.getChild(5)) # iter
+
+         # do后跳转回条件判断
+        if not self.Blocks[-1].is_terminated:
+            self.Builders[-1].branch(condBlock)
+
+        # 处理endBlock，对应后续操作
+        self.Blocks.pop()
+        self.Builders.pop()
+        self.Blocks.append(endBlock)
+        self.Builders.append(ir.IRBuilder(endBlock))
+        self.SymbolTable.QuitScope()
+        return
+    
+    # for子块：for_var
+    def visitFor_var(self, ctx:CgrammerParser.For_varContext):
+        Length = ctx.getChildCount()
+        if Length == 0:
+            return
+
+        self.visit(ctx.getChild(0))
+        return
+
+    # for子块：for_iter
+    def visitFor_iter(self, ctx:CgrammerParser.FloatContext):
+        Length = ctx.getChildCount()
+        if Length == 0:
+            return
+
+        self.visit(ctx.getChild(0))
+        return
+
+    # TODO：具体代码块：switch
+    def visitSwitch_block(self, ctx: CgrammerParser.Switch_blockContext):
+        return self.visitChildren(ctx)
+    
     # Visit a parse tree produced by CgrammerParser#pointer_flag.
     def visitPointer_flag(self, ctx: CgrammerParser.Pointer_flagContext):
         return self.visitChildren(ctx)
@@ -271,34 +501,39 @@ class Visitor(CgrammerVisitor):
 
     # Visit a parse tree produced by CgrammerParser#id.
     def visitId(self, ctx: CgrammerParser.IdContext):
-        return self.visitChildren(ctx)
+        name = ctx.getChild(0).getText()
+        if self.SymbolTable.JudgeExist(name):
+            builder = self.Builders[-1]
+            item = self.SymbolTable.GetItem(name)
+            if item is not None:
+                return builder.load(item["type"], item["entry"])
 
     # Visit a parse tree produced by CgrammerParser#int_value.
     def visitInt_value(self, ctx: CgrammerParser.Int_valueContext):
-        return self.visitChildren(ctx)
+        return int(ctx.getChild(0).getText())
 
     # Visit a parse tree produced by CgrammerParser#float_value.
     def visitFloat_value(self, ctx: CgrammerParser.Float_valueContext):
-        return self.visitChildren(ctx)
+        return float(ctx.getChild(0).getText())
 
     # Visit a parse tree produced by CgrammerParser#char_value.
     def visitChar_value(self, ctx: CgrammerParser.Char_valueContext):
-        return self.visitChildren(ctx)
+        return ctx.getChild(0).getText()
 
     # Visit a parse tree produced by CgrammerParser#string_value.
     def visitString_value(self, ctx: CgrammerParser.String_valueContext):
-        return self.visitChildren(ctx)
+        return ctx.getChild(0).getText()
 
     # Visit a parse tree produced by CgrammerParser#bool_value.
     def visitBool_value(self, ctx: CgrammerParser.Bool_valueContext):
-        return self.visitChildren(ctx)
+        return ctx.getChild(0).getText()
 
     # Visit a parse tree produced by CgrammerParser#function_call_.
     def visitFunction_call_(self, ctx: CgrammerParser.Function_call_Context):
-        return self.visitChildren(ctx)
+        return self.visit(ctx.getChild(0))
 
     # Visit a parse tree produced by CgrammerParser#round.
-    def visitRound(self, ctx:CgrammerParser.RoundContext):
+    def visitRound(self, ctx: CgrammerParser.RoundContext):
         return self.visit(ctx.getChild(1))
 
     # Visit a parse tree produced by CgrammerParser#expr_value.
@@ -306,7 +541,7 @@ class Visitor(CgrammerVisitor):
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by CgrammerParser#content_of.
-    def visitContent_of(self, ctx:CgrammerParser.Content_ofContext):
+    def visitContent_of(self, ctx: CgrammerParser.Content_ofContext):
         Index = self.visit(ctx.getChild(1))
         Builder = self.Builders[-1]
         RealReturnValue = Builder.load(Index['name'])
@@ -316,7 +551,7 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#address_of.
-    def visitAddress_of(self, ctx:CgrammerParser.Address_ofContext):
+    def visitAddress_of(self, ctx: CgrammerParser.Address_ofContext):
         Index = self.visit(ctx.getChild(1))
         Builder = self.Builders[-1]
         RealReturnValue = Builder.gep(Index['name'], [ir.Constant(ir.IntType(32), 0)])
@@ -326,7 +561,7 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#array.
-    def visitArray(self, ctx:CgrammerParser.ArrayContext):
+    def visitArray(self, ctx: CgrammerParser.ArrayContext):
         TempRequireLoad = self.WhetherNeedLoad
         self.WhetherNeedLoad = False
         res = self.visit(ctx.getChild(0))  # mID
@@ -356,7 +591,7 @@ class Visitor(CgrammerVisitor):
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by CgrammerParser#lincrese.
-    def visitLincrese(self, ctx:CgrammerParser.LincreseContext):
+    def visitLincrese(self, ctx: CgrammerParser.LincreseContext):
         Index = self.visit(ctx.getChild(1))
         Builder = self.Builders[-1]
         OriginalValue = Builder.load(Index['name'])
@@ -368,7 +603,7 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#rincrease.
-    def visitRincrease(self, ctx:CgrammerParser.RincreaseContext):
+    def visitRincrease(self, ctx: CgrammerParser.RincreaseContext):
         Index = self.visit(ctx.getChild(0))
         Builder = self.Builders[-1]
         OriginalValue = Builder.load(Index['name'])
@@ -380,7 +615,7 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#ldecrease.
-    def visitLdecrease(self, ctx:CgrammerParser.LdecreaseContext):
+    def visitLdecrease(self, ctx: CgrammerParser.LdecreaseContext):
         Index = self.visit(ctx.getChild(1))
         Builder = self.Builders[-1]
         OriginalValue = Builder.load(Index['name'])
@@ -392,7 +627,7 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#rdecrease.
-    def visitRdecrease(self, ctx:CgrammerParser.RdecreaseContext):
+    def visitRdecrease(self, ctx: CgrammerParser.RdecreaseContext):
         Index = self.visit(ctx.getChild(0))
         Builder = self.Builders[-1]
         OriginalValue = Builder.load(Index['name'])
@@ -404,7 +639,7 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#not.
-    def visitNot(self, ctx:CgrammerParser.NotContext):
+    def visitNot(self, ctx: CgrammerParser.NotContext):
         RealReturnValue = self.visit(ctx.getChild(1))
         return self.toBoolean(RealReturnValue, notFlag=True)
 
@@ -413,7 +648,7 @@ class Visitor(CgrammerVisitor):
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by CgrammerParser#negative.
-    def visitNegative(self, ctx:CgrammerParser.NegativeContext):
+    def visitNegative(self, ctx: CgrammerParser.NegativeContext):
         IndexMid = self.visit(ctx.getChild(1))
         Builder = self.Builders[-1]
         RealReturnValue = Builder.neg(IndexMid['name'])
@@ -427,7 +662,7 @@ class Visitor(CgrammerVisitor):
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by CgrammerParser#divide.
-    def visitDivide(self, ctx:CgrammerParser.DivideContext):
+    def visitDivide(self, ctx: CgrammerParser.DivideContext):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
@@ -443,7 +678,7 @@ class Visitor(CgrammerVisitor):
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by CgrammerParser#multiply.
-    def visitMultiply(self, ctx:CgrammerParser.MultiplyContext):
+    def visitMultiply(self, ctx: CgrammerParser.MultiplyContext):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
@@ -455,7 +690,7 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#modulo.
-    def visitModulo(self, ctx:CgrammerParser.ModuloContext):
+    def visitModulo(self, ctx: CgrammerParser.ModuloContext):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
@@ -467,7 +702,7 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#add.
-    def visitAdd(self, ctx:CgrammerParser.AddContext):
+    def visitAdd(self, ctx: CgrammerParser.AddContext):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
@@ -479,7 +714,7 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#subtract.
-    def visitSubtract(self, ctx:CgrammerParser.SubtractContext):
+    def visitSubtract(self, ctx: CgrammerParser.SubtractContext):
         Builder = self.Builders[-1]
         Index1 = self.visit(ctx.getChild(0))
         Index2 = self.visit(ctx.getChild(2))
@@ -510,11 +745,11 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#equal.
-    def visitEqual(self, ctx:CgrammerParser.EqualContext):
+    def visitEqual(self, ctx: CgrammerParser.EqualContext):
         return self.visitJudge(self, ctx)
 
     # Visit a parse tree produced by CgrammerParser#nequal.
-    def visitNequal(self, ctx:CgrammerParser.NequalContext):
+    def visitNequal(self, ctx: CgrammerParser.NequalContext):
         return self.visitJudge(self, ctx)
 
     # Visit a parse tree produced by CgrammerParser#calc2.
@@ -522,19 +757,19 @@ class Visitor(CgrammerVisitor):
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by CgrammerParser#greater.
-    def visitGreater(self, ctx:CgrammerParser.GreaterContext):
+    def visitGreater(self, ctx: CgrammerParser.GreaterContext):
         return self.visitJudge(self, ctx)
 
     # Visit a parse tree produced by CgrammerParser#gequal.
-    def visitGequal(self, ctx:CgrammerParser.GequalContext):
+    def visitGequal(self, ctx: CgrammerParser.GequalContext):
         return self.visitJudge(self, ctx)
 
     # Visit a parse tree produced by CgrammerParser#less.
-    def visitLess(self, ctx:CgrammerParser.LessContext):
+    def visitLess(self, ctx: CgrammerParser.LessContext):
         return self.visitJudge(self, ctx)
 
     # Visit a parse tree produced by CgrammerParser#leuqal.
-    def visitLeuqal(self, ctx:CgrammerParser.LeuqalContext):
+    def visitLeuqal(self, ctx: CgrammerParser.LeuqalContext):
         return self.visitJudge(self, ctx)
 
     # Visit a parse tree produced by CgrammerParser#rop1.
@@ -542,7 +777,7 @@ class Visitor(CgrammerVisitor):
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by CgrammerParser#or.
-    def visitOr(self, ctx:CgrammerParser.OrContext):
+    def visitOr(self, ctx: CgrammerParser.OrContext):
         Index1 = self.visit(ctx.getChild(0))
         Index1 = self.toBoolean(Index1, notFlag=False)
         Index2 = self.visit(ctx.getChild(2))
@@ -555,7 +790,7 @@ class Visitor(CgrammerVisitor):
         }
 
     # Visit a parse tree produced by CgrammerParser#and.
-    def visitAnd(self, ctx:CgrammerParser.AndContext):
+    def visitAnd(self, ctx: CgrammerParser.AndContext):
         Index1 = self.visit(ctx.getChild(0))
         Index1 = self.toBoolean(Index1, notFlag=False)
         Index2 = self.visit(ctx.getChild(2))
@@ -626,74 +861,75 @@ class Visitor(CgrammerVisitor):
         elif self.isInteger(Index2['type']) and Index1['type'] == float32:
             Index2 = self.convertIDS(Index2, Index1['type'])
         else:
-            raise SemanticError(ctx=ctx,msg="类型不匹�?")
+            raise SemanticError(ctx=ctx, msg="类型不匹�?")
         return Index1, Index2
 
     def convertIIZ(self, CalcIndex, DType):
         Builder = self.Builders[-1]
         ConfirmedVal = Builder.zext(CalcIndex['name'], DType)
         return {
-                'type': DType,
-                'name': ConfirmedVal
+            'type': DType,
+            'name': ConfirmedVal
         }
 
     def convertIIS(self, CalcIndex, DType):
         Builder = self.Builders[-1]
         ConfirmedVal = Builder.sext(CalcIndex['name'], DType)
         return {
-                'type': DType,
-                'name': ConfirmedVal
+            'type': DType,
+            'name': ConfirmedVal
         }
 
     def convertDIS(self, CalcIndex, DType):
         Builder = self.Builders[-1]
         ConfirmedVal = Builder.fptosi(CalcIndex['name'], DType)
         return {
-                'type': DType,
-                'name': ConfirmedVal
+            'type': DType,
+            'name': ConfirmedVal
         }
 
     def convertDIU(self, CalcIndex, DType):
         Builder = self.Builders[-1]
         ConfirmedVal = Builder.fptoui(CalcIndex['name'], DType)
         return {
-                'type': DType,
-                'name': ConfirmedVal
+            'type': DType,
+            'name': ConfirmedVal
         }
 
     def convertIDS(self, CalcIndex):
         Builder = self.Builders[-1]
         ConfirmedVal = Builder.sitofp(CalcIndex['name'], float32)
         return {
-                'type': float32,
-                'name': ConfirmedVal
+            'type': float32,
+            'name': ConfirmedVal
         }
 
     def convertIDU(self, CalcIndex):
         Builder = self.Builders[-1]
         ConfirmedVal = Builder.uitofp(CalcIndex['name'], float32)
         return {
-                'type': float32,
-                'name': ConfirmedVal
+            'type': float32,
+            'name': ConfirmedVal
         }
 
-    def toBoolean(self, ManipulateIndex, notFlag = True):
+    def toBoolean(self, ManipulateIndex, notFlag=True):
         Builder = self.Builders[-1]
         if notFlag:
             OperationChar = '=='
         else:
             OperationChar = '!='
         if ManipulateIndex['type'] == int8 or ManipulateIndex['type'] == int32:
-            RealReturnValue = Builder.icmp_signed(OperationChar, ManipulateIndex['name'], ir.Constant(ManipulateIndex['type'], 0))
+            RealReturnValue = Builder.icmp_signed(OperationChar, ManipulateIndex['name'],
+                                                  ir.Constant(ManipulateIndex['type'], 0))
             return {
-                    'tpye': int1,
-                    'name': RealReturnValue
+                'tpye': int1,
+                'name': RealReturnValue
             }
         elif ManipulateIndex['type'] == float32:
             RealReturnValue = Builder.fcmp_ordered(OperationChar, ManipulateIndex['name'], ir.Constant(float32, 0))
             return {
-                    'tpye': int1,
-                    'name': RealReturnValue
+                'tpye': int1,
+                'name': RealReturnValue
             }
         return ManipulateIndex
 
@@ -782,61 +1018,6 @@ class Visitor(CgrammerVisitor):
         self.Builders.pop()
         self.SymbolTable.QuitScope()
 
-    # Visit a parse tree produced by CgrammerParser#if_block.
-    def visitIf_block(self, ctx: CgrammerParser.If_blockContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#while_block.
-    def visitWhile_block(self, ctx: CgrammerParser.While_blockContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#for_block.
-    def visitFor_block(self, ctx: CgrammerParser.For_blockContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#switch_block.
-    def visitSwitch_block(self, ctx: CgrammerParser.Switch_blockContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#line.
-    def visitLine(self, ctx: CgrammerParser.LineContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#if.
-    def visitIf(self, ctx: CgrammerParser.IfContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#while.
-    def visitWhile(self, ctx: CgrammerParser.WhileContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#for.
-    def visitFor(self, ctx: CgrammerParser.ForContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#switch.
-    def visitSwitch(self, ctx: CgrammerParser.SwitchContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#single.
-    def visitSingle(self, ctx: CgrammerParser.SingleContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#function.
-    def visitFunction(self, ctx: CgrammerParser.FunctionContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#simple_code.
-    def visitSimple_code(self, ctx: CgrammerParser.Simple_codeContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#domained_code.
-    def visitDomained_code(self, ctx: CgrammerParser.Domained_codeContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by CgrammerParser#code.
-    def visitCode(self, ctx: CgrammerParser.CodeContext):
-        return self.visitChildren(ctx)
 
     def save(self, filename):
         with open(filename, "w") as f:
@@ -844,9 +1025,9 @@ class Visitor(CgrammerVisitor):
 
 
 class Compiler:
-    # 遍历�?
+    # 遍历器
     visitor = Visitor()
-
+    
     def compile(self, input_filename, output_filename):
         lexer = CgrammerLexer(FileStream(input_filename))
         stream = CommonTokenStream(lexer)

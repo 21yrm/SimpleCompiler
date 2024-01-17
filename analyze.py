@@ -70,6 +70,6 @@ if __name__ == '__main__':
     parser = CgrammerParser(stream)
     visitor = Visitor()
 
-    visitor.visit(parser.code())
+    visitor.visit(parser.program())
     # print(visitor.tree)
     print_json_tree(visitor.tree)

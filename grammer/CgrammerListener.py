@@ -44,6 +44,15 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CgrammerParser#string.
+    def enterString(self, ctx:CgrammerParser.StringContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#string.
+    def exitString(self, ctx:CgrammerParser.StringContext):
+        pass
+
+
     # Enter a parse tree produced by CgrammerParser#pointer_flag.
     def enterPointer_flag(self, ctx:CgrammerParser.Pointer_flagContext):
         pass
@@ -629,12 +638,48 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CgrammerParser#condition.
+    def enterCondition(self, ctx:CgrammerParser.ConditionContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#condition.
+    def exitCondition(self, ctx:CgrammerParser.ConditionContext):
+        pass
+
+
     # Enter a parse tree produced by CgrammerParser#if_block.
     def enterIf_block(self, ctx:CgrammerParser.If_blockContext):
         pass
 
     # Exit a parse tree produced by CgrammerParser#if_block.
     def exitIf_block(self, ctx:CgrammerParser.If_blockContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#pure_if_block.
+    def enterPure_if_block(self, ctx:CgrammerParser.Pure_if_blockContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#pure_if_block.
+    def exitPure_if_block(self, ctx:CgrammerParser.Pure_if_blockContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#elif_block.
+    def enterElif_block(self, ctx:CgrammerParser.Elif_blockContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#elif_block.
+    def exitElif_block(self, ctx:CgrammerParser.Elif_blockContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#else_block.
+    def enterElse_block(self, ctx:CgrammerParser.Else_blockContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#else_block.
+    def exitElse_block(self, ctx:CgrammerParser.Else_blockContext):
         pass
 
 
@@ -653,6 +698,24 @@ class CgrammerListener(ParseTreeListener):
 
     # Exit a parse tree produced by CgrammerParser#for_block.
     def exitFor_block(self, ctx:CgrammerParser.For_blockContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#for_var.
+    def enterFor_var(self, ctx:CgrammerParser.For_varContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#for_var.
+    def exitFor_var(self, ctx:CgrammerParser.For_varContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#for_iter.
+    def enterFor_iter(self, ctx:CgrammerParser.For_iterContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#for_iter.
+    def exitFor_iter(self, ctx:CgrammerParser.For_iterContext):
         pass
 
 
@@ -746,57 +809,12 @@ class CgrammerListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CgrammerParser#if.
-    def enterIf(self, ctx:CgrammerParser.IfContext):
+    # Enter a parse tree produced by CgrammerParser#block.
+    def enterBlock(self, ctx:CgrammerParser.BlockContext):
         pass
 
-    # Exit a parse tree produced by CgrammerParser#if.
-    def exitIf(self, ctx:CgrammerParser.IfContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#while.
-    def enterWhile(self, ctx:CgrammerParser.WhileContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#while.
-    def exitWhile(self, ctx:CgrammerParser.WhileContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#for.
-    def enterFor(self, ctx:CgrammerParser.ForContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#for.
-    def exitFor(self, ctx:CgrammerParser.ForContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#switch.
-    def enterSwitch(self, ctx:CgrammerParser.SwitchContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#switch.
-    def exitSwitch(self, ctx:CgrammerParser.SwitchContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#single.
-    def enterSingle(self, ctx:CgrammerParser.SingleContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#single.
-    def exitSingle(self, ctx:CgrammerParser.SingleContext):
-        pass
-
-
-    # Enter a parse tree produced by CgrammerParser#function.
-    def enterFunction(self, ctx:CgrammerParser.FunctionContext):
-        pass
-
-    # Exit a parse tree produced by CgrammerParser#function.
-    def exitFunction(self, ctx:CgrammerParser.FunctionContext):
+    # Exit a parse tree produced by CgrammerParser#block.
+    def exitBlock(self, ctx:CgrammerParser.BlockContext):
         pass
 
 
@@ -824,6 +842,15 @@ class CgrammerListener(ParseTreeListener):
 
     # Exit a parse tree produced by CgrammerParser#code.
     def exitCode(self, ctx:CgrammerParser.CodeContext):
+        pass
+
+
+    # Enter a parse tree produced by CgrammerParser#program.
+    def enterProgram(self, ctx:CgrammerParser.ProgramContext):
+        pass
+
+    # Exit a parse tree produced by CgrammerParser#program.
+    def exitProgram(self, ctx:CgrammerParser.ProgramContext):
         pass
 
 
